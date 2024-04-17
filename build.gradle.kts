@@ -25,13 +25,21 @@ repositories {
 }
 
 dependencies {
+	//mongodb
 	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
+
+	//swagger
+	implementation ("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2") //springboot version 3 이상
+	//implementation("org.springdoc:springdoc-openapi-ui:1.6.11") //springboot version 3 이하
+
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
+
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 }
