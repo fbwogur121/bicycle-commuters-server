@@ -1,4 +1,4 @@
-package com.capstone.jachulsa.collection
+package com.capstone.jachulsa.domain
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document

@@ -1,8 +1,8 @@
 package com.capstone.jachulsa
 
-import com.capstone.jachulsa.collection.Address
-import com.capstone.jachulsa.collection.TotalRiding
-import com.capstone.jachulsa.collection.User
+import com.capstone.jachulsa.domain.Address
+import com.capstone.jachulsa.domain.TotalRiding
+import com.capstone.jachulsa.domain.User
 import com.capstone.jachulsa.repository.UserRepository
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

@@ -1,7 +1,7 @@
 package com.capstone.jachulsa.controller
 
 import com.capstone.jachulsa.repository.UserRepository
-import com.capstone.jachulsa.collection.User
+import com.capstone.jachulsa.domain.User
 import org.springframework.web.bind.annotation.*
 
 @RestController
