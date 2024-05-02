@@ -35,7 +35,7 @@ package com.capstone.jachulsa.domain
 import com.capstone.jachulsa.domain.common.BaseEntity
 import com.capstone.jachulsa.domain.enums.Gender
 import com.capstone.jachulsa.domain.enums.SocialType
-import com.capstone.jachulsa.domain.enums.MemberStatus
+import com.capstone.jachulsa.domain.enums.UserStatus
 import jakarta.persistence.*
 import java.time.LocalDate
 
@@ -44,7 +44,10 @@ import java.time.LocalDate
 class User(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
-        var id: Long? = null,
+        var user_id: Long? = null,
+
+        @Column(nullable = false, length = 50)
+        var email: String? = null,
 
         @Column(nullable = false, length = 20)
         var name: String? = null,
@@ -64,13 +67,7 @@ class User(
 
         @Enumerated(EnumType.STRING)
         @Column(columnDefinition = "VARCHAR(15) DEFAULT 'ACTIVE'")
-        var status: MemberStatus? = null,
+        var is_active: UserStatus? = null,
 
-        var inactiveDate: LocalDate? = null,
-
-        @Column(nullable = false, length = 50)
-        var email: String? = null,
-
-        @Column(columnDefinition = "INT DEFAULT 0")
-        var point: Int = 0
+        var inactiveDate: LocalDate? = null
 ) : BaseEntity()

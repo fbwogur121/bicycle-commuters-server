@@ -1,5 +1,5 @@
 package com.capstone.jachulsa.domain.enums
 
-enum class MemberStatus {
+enum class UserStatus {
     ACTIVE, INACTIVE
 }

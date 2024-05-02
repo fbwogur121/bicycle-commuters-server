@@ -1,4 +1,4 @@
-package com.capstone.jachulsa.controller
+package com.capstone.jachulsa.web.controller
 
 import org.springframework.web.bind.annotation.*
 

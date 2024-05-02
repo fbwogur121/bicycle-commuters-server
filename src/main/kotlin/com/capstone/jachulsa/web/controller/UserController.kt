@@ -1,4 +1,4 @@
-package com.capstone.jachulsa.controller
+package com.capstone.jachulsa.web.controller
 
 import com.capstone.jachulsa.repository.UserRepository
 import com.capstone.jachulsa.domain.User
