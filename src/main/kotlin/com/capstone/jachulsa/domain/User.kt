@@ -2,6 +2,7 @@ package com.capstone.jachulsa.domain
 
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDate
+//
 
 @Document(collection = "User")
 data class User(
