@@ -1,13 +1,10 @@
 package com.capstone.jachulsa.domain
 
-import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDate
 
 @Document(collection = "User")
 data class User(
-        @Id
-        val user_id: String,
         val email: String,
         val name: String,
         val nickname: String,
