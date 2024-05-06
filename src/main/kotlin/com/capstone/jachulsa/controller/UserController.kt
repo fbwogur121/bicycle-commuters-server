@@ -1,12 +1,16 @@
 package com.capstone.jachulsa.controller
 
-import com.capstone.jachulsa.repository.UserRepository
 import com.capstone.jachulsa.domain.User
+import com.capstone.jachulsa.repository.UserRepository
+import com.capstone.jachulsa.service.UserService
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/users")
-class UserController(private val repository: UserRepository) {
+class UserController(
+    private val repository: UserRepository,
+    private val userService: UserService
+) {
 
     // GET /users : 모든 사용자 조회
     @GetMapping
@@ -58,5 +62,34 @@ class UserController(private val repository: UserRepository) {
     @GetMapping("/name/{name}")
     fun getUsersByName(@PathVariable name: String): List<User> {
         return repository.findByName(name)
+    }
+
+
+    // POST /users/name : 주어진 name으로 유저 조회
+    @PostMapping("/name")
+    fun getUsersByName(@RequestBody request: Map<String, String>): List<User> {
+        val name = request["name"]
+        return if (name != null) {
+            repository.findByName(name)
+        } else {
+            emptyList()
+        }
+    }
+
+    // PUT /users/deactivate : 주어진 name으로 유저 탈퇴
+    @PutMapping("/deactivate")
+    fun deactivateUser(@RequestBody request: Map<String, String>): User {
+        val name = request["name"]
+        return if (name != null) {
+            val existingUser = repository.findByName(name).firstOrNull()
+            if (existingUser != null) {
+                val updatedUser = existingUser.copy(is_active = false)
+                repository.save(updatedUser)
+            } else {
+                throw Exception("User not found")
+            }
+        } else {
+            throw Exception("Name is required")
+        }
     }
 }
