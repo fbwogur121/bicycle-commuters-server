@@ -7,7 +7,7 @@ import java.time.LocalDate
 @Document(collection = "Expenses")
 data class RidingHistory(
         @Id
-        val rudubg_id: String,
+        val riding_id: String,
         val user_id: String,
         val type: String,
         val date: LocalDate,
