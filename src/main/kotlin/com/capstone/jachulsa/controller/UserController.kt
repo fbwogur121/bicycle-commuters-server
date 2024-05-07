@@ -76,20 +76,17 @@ class UserController(
         }
     }
 
-    // PUT /users/deactivate : 주어진 name으로 유저 탈퇴
+    // PUT /users/deactivate : 주어진 email로 유저 탈퇴(is_active true>false)
     @PutMapping("/deactivate")
     fun deactivateUser(@RequestBody request: Map<String, String>): User {
-        val name = request["name"]
-        return if (name != null) {
-            val existingUser = repository.findByName(name).firstOrNull()
-            if (existingUser != null) {
-                val updatedUser = existingUser.copy(is_active = false)
-                repository.save(updatedUser)
-            } else {
-                throw Exception("User not found")
-            }
-        } else {
-            throw Exception("Name is required")
-        }
+        val email = request["email"] ?: throw Exception("Email is required")
+        return userService.deactivateUser(email)
+    }
+
+    // PUT /users/activate : 주어진 email로 사용자의 is_active를 true로 변경
+    @PutMapping("/activate")
+    fun activateUser(@RequestBody request: Map<String, String>): User {
+        val email = request["email"] ?: throw Exception("Email is required")
+        return userService.activateUser(email)
     }
 }
