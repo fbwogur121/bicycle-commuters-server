@@ -22,7 +22,7 @@ class LoginService {
     fun getNaverAuthorizeUrl(type: String): String {
         val baseUrl = "https://nid.naver.com/oauth2.0/authorize"
         val clientId = "KsYEPMXctpGK6qPFxnbF"
-        val redirectUrl = "http://localhost:8080/oauth/login"
+        val redirectUrl = "https://api.jachulsa.shop/oauth/login"
         val uriComponents = UriComponentsBuilder
             .fromUriString(baseUrl)
             .queryParam("response_type", "code")
