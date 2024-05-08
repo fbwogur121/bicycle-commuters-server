@@ -63,6 +63,7 @@ class GlobalExceptionHandler {
         return ErrorResponse.toResponseEntity(ResponseCode.RESOURCE_NOT_FOUND)
     }
 
+
     // 잘못된 요청 처리
     @ExceptionHandler(NoHandlerFoundException::class)
     fun handleNotFoundException(e: NoHandlerFoundException): ResponseEntity<ErrorResponse> {
