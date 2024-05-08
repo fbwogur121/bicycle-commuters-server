@@ -6,6 +6,8 @@ import com.capstone.jachulsa.service.NaverRes
 import com.capstone.jachulsa.service.NaverToken
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import lombok.*
@@ -14,17 +16,19 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.bind.annotation.RestController
 import java.io.UnsupportedEncodingException
 import java.net.MalformedURLException
 import java.net.URISyntaxException
 
-
-@Controller
+@Tag(name = "Naver login API", description = "네이버로그인 api")
+@RestController
 @RequiredArgsConstructor
 class LoginController(
         private val loginService: LoginService
 ) {
 
+    @Operation(summary = "authorize token 발급, /oauth/login 으로 redirect api")
     @GetMapping("/naver-login")
     @Throws(
         MalformedURLException::class,
@@ -42,6 +46,7 @@ class LoginController(
         }
     }
 
+    @Operation(summary = "naver user 정보 return api")
     @GetMapping("/oauth/login")
     @ResponseBody
     @Throws(
