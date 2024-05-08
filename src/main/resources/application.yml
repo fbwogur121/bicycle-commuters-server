@@ -47,7 +47,7 @@ spring:
             client-secret: _fmpPupJcu
             clientAuthenticationMethod: POST
             authorization-grant-type: authorization_code
-            redirect-uri: "https://api.jachulsa.shop/oauth/login"
+            redirect-uri: "http://localhost:8080/oauth/login"
             client-name: Naver
             scope:
               - name
