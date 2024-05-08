@@ -72,7 +72,7 @@ class ExpenditureController(private val service: ExpenditureService) {
         val expenditureId: String? = null,
         val userId: String? = null,
         val expenditureType: String? = null,
-        val expenditureAmountWon: String? = null,
+        val expenditureAmountWon: Int? = null,
         val date: LocalDate? = null,
         val note: String? = null
     )

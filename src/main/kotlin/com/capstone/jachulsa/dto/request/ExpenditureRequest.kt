@@ -9,8 +9,7 @@ data class ExpenditureRequest(
     val userId: String,
     @field:NotBlank(message = "2001")
     val expenditureType: String,
-    @field:NotBlank(message = "2001")
-    val expenditureAmountWon: String,
+    val expenditureAmountWon: Int,
     val date: LocalDate,
     val note: String?
 ) {
