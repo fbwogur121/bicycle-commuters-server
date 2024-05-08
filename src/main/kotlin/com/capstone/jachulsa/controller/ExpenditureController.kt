@@ -1,5 +1,6 @@
 package com.capstone.jachulsa.controller
 
+import com.capstone.jachulsa.domain.enumtype.ExpenditureType
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
@@ -21,7 +22,7 @@ import java.time.LocalDate
 class ExpenditureController(private val service: ExpenditureService) {
 
     // POST expenditure : 지출 생성
-    @Operation(summary = "지출 생성", description = "")
+    @Operation(summary = "지출 생성", description = "해당 유저의 지출 기록 생성, POST 요청 성공 시 생성 된 userId 반환")
     @PostMapping
     fun createExpenditure(@Validated @RequestBody request: ExpenditureRequest): ApiResponse<ExpenditureResponse> {
         val expenditureId = service.createExpenditure(request.toExpenditure())
@@ -32,17 +33,15 @@ class ExpenditureController(private val service: ExpenditureService) {
     //userId- pathaVariable으로 받아서
     //조회 기간 QueryString 필요, 페이징 처리 필요, 내 지출 기록만 조회 할건지 QueryString 필요. JWT 필요
     @GetMapping("/{userId}")
-    @Operation(summary = "지출 기록 조회", description = "")
+    @Operation(summary = "지출 기록 조회", description = "조회 기간 내 지출 기록을 페이징 처리 후 반환")
     @Parameters(Parameter(name = "startDate", description = "조회 시작일"),
         Parameter(name = "endDate", description = "조회 마감일"),
-//        Parameter(name = "myExpenditureOnly", description = "내 지출만 조회"),
         Parameter(name = "page", description = "페이지 수"),
         Parameter(name = "size", description = "페이징 사이즈"))
     fun getExpenditure(
         @PathVariable userId: String,
         @RequestParam("startDate") startDate: LocalDate,
         @RequestParam("endDate") endDate: LocalDate,
-//        @RequestParam("myExpenditureOnly") myExpenditureOnly: Boolean,
         @RequestParam("page") page: Int,
         @RequestParam("size") size: Int
     ): ApiResponse<ExpenditureListResponse> {
@@ -71,7 +70,7 @@ class ExpenditureController(private val service: ExpenditureService) {
     data class ExpenditureResponse(
         val expenditureId: String? = null,
         val userId: String? = null,
-        val expenditureType: String? = null,
+        val expenditureType: ExpenditureType? = null,
         val expenditureAmountWon: Int? = null,
         val date: LocalDate? = null,
         val note: String? = null

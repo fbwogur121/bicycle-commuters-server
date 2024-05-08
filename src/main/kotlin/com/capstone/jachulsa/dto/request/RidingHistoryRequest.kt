@@ -4,17 +4,17 @@ import com.capstone.jachulsa.domain.Arrivals
 import com.capstone.jachulsa.domain.Departures
 import com.capstone.jachulsa.domain.RidingHistory
 import com.capstone.jachulsa.domain.Stopover
+import com.capstone.jachulsa.domain.enumtype.Bike
+import com.capstone.jachulsa.domain.enumtype.RidingType
 import jakarta.validation.constraints.NotBlank
 import java.time.LocalDate
 
 data class RidingHistoryRequest(
     @field:NotBlank(message = "2001")
     val userId: String,
-    @field:NotBlank(message = "2001")
-    val type: String,
+    val type: RidingType,
     val date: LocalDate,
-    @field:NotBlank(message = "2001")
-    val bike: String?,
+    val bike: Bike?,
     val departures: Departures,
     val arrivals: Arrivals,
     val stopover: Stopover?,

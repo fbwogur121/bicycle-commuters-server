@@ -25,7 +25,7 @@ class ExpenditureService(private val expenditureRepository: ExpenditureRepositor
         startDate: LocalDate,
         endDate: LocalDate,
         pageable: Pageable
-    ): Page<Expenditure> { //myExpenditureOnly: Boolean,
+    ): Page<Expenditure> {
 
         val user = userRepository.findById(userId)
             .orElseThrow { CustomException(ResponseCode.USER_NOT_FOUND) }
