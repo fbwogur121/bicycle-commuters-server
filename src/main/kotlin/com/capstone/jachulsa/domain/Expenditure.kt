@@ -11,7 +11,7 @@ data class Expenditure(
         val expenditureId: ObjectId? = null,
         val userId: String,
         val expenditureType: String,
-        val expenditureAmountWon: String,
+        val expenditureAmountWon: Int,
         val date: LocalDate,
         val note: String?
 )

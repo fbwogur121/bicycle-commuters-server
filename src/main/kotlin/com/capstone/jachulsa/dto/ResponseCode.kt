@@ -40,6 +40,9 @@ enum class ResponseCode(
 
     // 404 Not Found 페이지
     RESOURCE_NOT_FOUND(HttpStatus.NOT_FOUND,2400,"요청한 주소를 찾을 수 없습니다."),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND,2401,"사용자가 존재하지 않습니다."),
+    EXPENDITURE_NOT_FOUND(HttpStatus.NOT_FOUND,2402,"지출 기록이 존재하지 않습니다."),
+    RIDING_NOT_FOUND(HttpStatus.NOT_FOUND,2403,"라이딩 기록이 존재하지 않습니다."),
 
 
     // 409 Conflict
