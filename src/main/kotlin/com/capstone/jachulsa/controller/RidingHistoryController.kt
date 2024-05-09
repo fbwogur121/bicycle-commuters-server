@@ -1,5 +1,7 @@
 package com.capstone.jachulsa.controller
 
+import com.capstone.jachulsa.domain.enumtype.Bike
+import com.capstone.jachulsa.domain.enumtype.RidingType
 import com.capstone.jachulsa.dto.ApiResponse
 import com.capstone.jachulsa.dto.ResponseCode
 import com.capstone.jachulsa.dto.request.RidingHistoryRequest
@@ -13,7 +15,6 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.servlet.resource.NoResourceFoundException
 import java.time.LocalDate
 
 
@@ -23,7 +24,7 @@ import java.time.LocalDate
 class RidingHistoryController (private val service: RidingHistoryService){
 
     // POST /riding : 라이딩 생성
-    @Operation(summary = "라이딩 생성", description = "")
+    @Operation(summary = "라이딩 생성", description = "해당 유저의 라이딩기록을 생성. POST 요청 성공 시 ridingId 반환")
     @PostMapping("/riding")
     fun createRidingHistory(@Validated @RequestBody request: RidingHistoryRequest): ApiResponse<RidingResponse> {
         val ridingHistoryId = service.createRidingHistory(request.toRidingHistory())
@@ -32,7 +33,7 @@ class RidingHistoryController (private val service: RidingHistoryService){
 
 
     //라이딩 리스트 조회
-    @Operation(summary = "라이딩 기록 조회", description = "")
+    @Operation(summary = "라이딩 기록 조회", description = "조회 기간 내 모든 라이딩 기록을 페이징 처리 후 반환. userId != null && myRidesOnly = true일 시 기간 내 해당 유저의 라이딩 기록만 조회")
     @Parameters(
         Parameter(name = "startDate", description = "조회 시작일"),
         Parameter(name = "endDate", description = "조회 마감일"),
@@ -40,7 +41,7 @@ class RidingHistoryController (private val service: RidingHistoryService){
         Parameter(name = "page", description = "페이지 수"),
         Parameter(name = "size", description = "페이징 사이즈")
     )
-    @GetMapping("/ridings/{userId}")
+    @GetMapping("/ridings")
     fun getRidings(
         @RequestParam("startDate") startDate: LocalDate,
         @RequestParam("endDate") endDate: LocalDate,
@@ -177,9 +178,9 @@ class RidingHistoryController (private val service: RidingHistoryService){
     data class RidingResponse(
         val ridingId: String? = null,
         val userId: String? = null,
-        val type: String? = null,
+        val type: RidingType? = null,
         val date: LocalDate? = null,
-        val bike: String? = null,
+        val bike: Bike? = null,
         val departures: DeparturesResponse? = null,
         val arrivals: ArrivalsResponse? = null,
         val stopover: StopoverResponse? = null,
