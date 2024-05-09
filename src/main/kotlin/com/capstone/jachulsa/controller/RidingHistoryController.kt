@@ -94,6 +94,7 @@ class RidingHistoryController (private val service: RidingHistoryService){
     }
 
 
+
     //라이딩 상세조회
     @Operation(summary = "라이딩 상세 조회", description = "")
     @GetMapping("/riding/{ridingId}")
@@ -142,6 +143,37 @@ class RidingHistoryController (private val service: RidingHistoryService){
     }
 
 
+
+    //랭킹 조회
+//    @Operation(summary = "랭킹 조회", description = "")
+//    @Parameters(
+//            Parameter(name = "startDate", description = "조회 시작일"),
+//            Parameter(name = "endDate", description = "조회 마감일"),
+//            Parameter(name = "myRidesOnly", description = "내 라이딩만 조회"),
+//            Parameter(name = "page", description = "페이지 수"),
+//            Parameter(name = "size", description = "페이징 사이즈")
+//    )
+//    @GetMapping("/ridings/{userId}")
+//    fun getRanking(
+//            @RequestParam("startDate") startDate: LocalDate,
+//            @RequestParam("endDate") endDate: LocalDate,
+//            @RequestParam("page") page: Int,
+//            @RequestParam("size") size: Int,
+//            @RequestParam("myRidesOnly", defaultValue = "false") myRidesOnly: Boolean,
+//            @PathVariable(required = false) userId: String?
+//    ): ApiResponse<RidingListResponse> {
+//
+//        return ApiResponse.success(ResponseCode.READ_SUCCESS, RidingListResponse())
+//    }
+
+
+
+
+
+
+
+
+
     data class RidingResponse(
         val ridingId: String? = null,
         val userId: String? = null,
@@ -181,4 +213,7 @@ class RidingHistoryController (private val service: RidingHistoryService){
         val totalItems: Long,
         val ridings: List<RidingResponse>
     )
+
+
+
 }
