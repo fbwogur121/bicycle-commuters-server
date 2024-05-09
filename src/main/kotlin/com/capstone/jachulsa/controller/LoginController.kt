@@ -46,43 +46,9 @@ class LoginController(
         }
     }
 
-    @Operation(summary = "naver user 정보 return api")
-    @GetMapping("/oauth/login")
-    @ResponseBody
-    @Throws(
-            MalformedURLException::class,
-            UnsupportedEncodingException::class,
-            URISyntaxException::class
-    )
-    fun callBack(
-            request: HttpServletRequest?,
-            response: HttpServletResponse?,
-            @RequestParam("code") code: String,
-            @RequestParam("state") state: String,
-            @RequestParam(value = "error", required = false) error: String?,
-            @RequestParam(value = "error_description", required = false) errorDescription: String?
-    ): String {
-        val callback = NaverCallback(code, state, error, errorDescription)
-        val responseToken: String? = loginService.getNaverTokenUrl(callback)
-        return if (responseToken != null) {
-            val mapper = ObjectMapper()
-            val token: NaverToken = mapper.readValue(responseToken, NaverToken::class.java)
-            val responseUser: String? = loginService.getNaverUserByToken(token)
-            if (responseUser != null) {
-                val naverUser: NaverRes = mapper.readValue(responseUser, NaverRes::class.java)
-                "naverUser.toString() : $naverUser\n" +
-                        "naverUser.response.gender : ${naverUser.response.gender}\n" +
-                        "naverUser.response.birthyear : ${naverUser.response.birthday}\n" +
-                        "naverUser.response.age : ${naverUser.response.age}"
-            } else {
-                "Naver 사용자 정보를 가져오는 데 실패했습니다."
-            }
-        } else {
-            "Naver 토큰을 가져오는 데 실패했습니다."
-        }
-    }
-
+//    @Operation(summary = "naver user 정보 return api")
 //    @GetMapping("/oauth/login")
+//    @ResponseBody
 //    @Throws(
 //            MalformedURLException::class,
 //            UnsupportedEncodingException::class,
@@ -95,25 +61,59 @@ class LoginController(
 //            @RequestParam("state") state: String,
 //            @RequestParam(value = "error", required = false) error: String?,
 //            @RequestParam(value = "error_description", required = false) errorDescription: String?
-//    ) {
+//    ): String {
 //        val callback = NaverCallback(code, state, error, errorDescription)
 //        val responseToken: String? = loginService.getNaverTokenUrl(callback)
-//        if (responseToken != null) {
+//        return if (responseToken != null) {
 //            val mapper = ObjectMapper()
 //            val token: NaverToken = mapper.readValue(responseToken, NaverToken::class.java)
 //            val responseUser: String? = loginService.getNaverUserByToken(token)
 //            if (responseUser != null) {
 //                val naverUser: NaverRes = mapper.readValue(responseUser, NaverRes::class.java)
-//                println("naverUser.toString() : " + naverUser.toString())
-//                println("naverUser.response.gender : " + naverUser.response.gender)
-//                println("naverUser.response.birthyear : " + naverUser.response.birthday)
-//                println("naverUser.response.age : " + naverUser.response.age)
+//                "naverUser.toString() : $naverUser\n" +
+//                        "naverUser.response.gender : ${naverUser.response.gender}\n" +
+//                        "naverUser.response.birthyear : ${naverUser.response.birthday}\n" +
+//                        "naverUser.response.age : ${naverUser.response.age}"
 //            } else {
-//                println("Naver 사용자 정보를 가져오는 데 실패했습니다.")
+//                "Naver 사용자 정보를 가져오는 데 실패했습니다."
 //            }
 //        } else {
-//            println("Naver 토큰을 가져오는 데 실패했습니다.")
+//            "Naver 토큰을 가져오는 데 실패했습니다."
 //        }
 //    }
+
+    @GetMapping("/oauth/login")
+    @Throws(
+            MalformedURLException::class,
+            UnsupportedEncodingException::class,
+            URISyntaxException::class
+    )
+    fun callBack(
+            request: HttpServletRequest?,
+            response: HttpServletResponse?,
+            @RequestParam("code") code: String,
+            @RequestParam("state") state: String,
+            @RequestParam(value = "error", required = false) error: String?,
+            @RequestParam(value = "error_description", required = false) errorDescription: String?
+    ) {
+        val callback = NaverCallback(code, state, error, errorDescription)
+        val responseToken: String? = loginService.getNaverTokenUrl(callback)
+        if (responseToken != null) {
+            val mapper = ObjectMapper()
+            val token: NaverToken = mapper.readValue(responseToken, NaverToken::class.java)
+            val responseUser: String? = loginService.getNaverUserByToken(token)
+            if (responseUser != null) {
+                val naverUser: NaverRes = mapper.readValue(responseUser, NaverRes::class.java)
+                println("naverUser.toString() : " + naverUser.toString())
+                println("naverUser.response.gender : " + naverUser.response.gender)
+                println("naverUser.response.birthyear : " + naverUser.response.birthday)
+                println("naverUser.response.age : " + naverUser.response.age)
+            } else {
+                println("Naver 사용자 정보를 가져오는 데 실패했습니다.")
+            }
+        } else {
+            println("Naver 토큰을 가져오는 데 실패했습니다.")
+        }
+    }
 
 }
