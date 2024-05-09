@@ -96,55 +96,6 @@ class RidingHistoryController (private val service: RidingHistoryService){
 
 
 
-    //라이딩 상세조회
-    @Operation(summary = "라이딩 상세 조회", description = "")
-    @GetMapping("/riding/{ridingId}")
-    fun getRidingHistory(@PathVariable ridingId: String): ApiResponse<RidingResponse> {
-        val ridingHistory = service.getRidingHistoryById(ridingId)
-
-        val departuresResponse = ridingHistory?.departures?.let { departures ->
-            DeparturesResponse(
-                longitude = departures.longitude,
-                latitude = departures.latitude,
-                detailAddress = departures.detailAddress
-            )
-        }
-
-        val arrivalsResponse = ridingHistory?.arrivals?.let { arrivals ->
-            ArrivalsResponse(
-                longitude = arrivals.longitude,
-                latitude = arrivals.latitude,
-                detailAddress = arrivals.detailAddress
-            )
-        }
-
-        val stopoverResponse = ridingHistory?.stopover?.let { stopover ->
-            StopoverResponse(
-                longitude = stopover.longitude,
-                latitude = stopover.latitude,
-                detailAddress = stopover.detailAddress
-            )
-        }
-
-        val ridingResponse = RidingResponse(
-            ridingId = ridingHistory?.ridingHistoryId.toString(),
-            userId = ridingHistory?.userId,
-            type = ridingHistory?.type,
-            date = ridingHistory?.date,
-            bike = ridingHistory?.bike,
-            departures = departuresResponse,
-            arrivals = arrivalsResponse,
-            stopover = stopoverResponse,
-            ridingMinutes = ridingHistory?.ridingMinutes,
-            distanceMeters = ridingHistory?.distanceMeters,
-            reduceAmountWon = ridingHistory?.reduceAmountWon
-        )
-
-        return ApiResponse.success(ResponseCode.READ_SUCCESS, ridingResponse)
-    }
-
-
-
     //랭킹 조회
 //    @Operation(summary = "랭킹 조회", description = "")
 //    @Parameters(
@@ -164,13 +115,58 @@ class RidingHistoryController (private val service: RidingHistoryService){
 //            @PathVariable(required = false) userId: String?
 //    ): ApiResponse<RidingListResponse> {
 //
-//        return ApiResponse.success(ResponseCode.READ_SUCCESS, RidingListResponse())
+//        return ApiResponse.success(ResponseCode.READ_SUCCESS, RankingListResponse)
 //    }
 
 
 
 
-
+//    //라이딩 상세조회
+//    @Operation(summary = "라이딩 상세 조회", description = "")
+//    @GetMapping("/riding/{ridingId}")
+//    fun getRidingHistory(@PathVariable ridingId: String): ApiResponse<RidingResponse> {
+//        val ridingHistory = service.getRidingHistoryById(ridingId)
+//
+//        val departuresResponse = ridingHistory?.departures?.let { departures ->
+//            DeparturesResponse(
+//                longitude = departures.longitude,
+//                latitude = departures.latitude,
+//                detailAddress = departures.detailAddress
+//            )
+//        }
+//
+//        val arrivalsResponse = ridingHistory?.arrivals?.let { arrivals ->
+//            ArrivalsResponse(
+//                longitude = arrivals.longitude,
+//                latitude = arrivals.latitude,
+//                detailAddress = arrivals.detailAddress
+//            )
+//        }
+//
+//        val stopoverResponse = ridingHistory?.stopover?.let { stopover ->
+//            StopoverResponse(
+//                longitude = stopover.longitude,
+//                latitude = stopover.latitude,
+//                detailAddress = stopover.detailAddress
+//            )
+//        }
+//
+//        val ridingResponse = RidingResponse(
+//            ridingId = ridingHistory?.ridingHistoryId.toString(),
+//            userId = ridingHistory?.userId,
+//            type = ridingHistory?.type,
+//            date = ridingHistory?.date,
+//            bike = ridingHistory?.bike,
+//            departures = departuresResponse,
+//            arrivals = arrivalsResponse,
+//            stopover = stopoverResponse,
+//            ridingMinutes = ridingHistory?.ridingMinutes,
+//            distanceMeters = ridingHistory?.distanceMeters,
+//            reduceAmountWon = ridingHistory?.reduceAmountWon
+//        )
+//
+//        return ApiResponse.success(ResponseCode.READ_SUCCESS, ridingResponse)
+//    }
 
 
 
@@ -215,6 +211,25 @@ class RidingHistoryController (private val service: RidingHistoryService){
         val ridings: List<RidingResponse>
     )
 
+    data class RankingResponse(
+            val userId: String,
+            val userName: String,
+            val distanceMeters: Int,
+            val ridingMinutes: Int,
+            val co2Grams: Int,
+            val kcal: Int
+    )
 
+    data class RankingListResponse(
+            val currentPage: Int,
+            val totalPages: Int,
+            val totalItems: Long,
+            val userCount: Int,
+            val totalRidingDistanceMeters: Int,
+            val totalTransportationExpenses: Int,
+            val totalCo2Grams: Int,
+            val totalRidingMinutes: Int,
+            val rankingList: List<RankingResponse>
+    )
 
 }
