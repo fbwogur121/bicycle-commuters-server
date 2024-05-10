@@ -8,4 +8,6 @@ import java.time.LocalDate
 
 interface ExpenditureRepository :MongoRepository<Expenditure, String>{
     fun findByUserIdAndDateBetween(userId: String, startDate: LocalDate, endDate: LocalDate, pageable: Pageable): Page<Expenditure>
+
+    fun findByUserId(userId: String, pageable: Pageable) : Page<Expenditure>
 }
