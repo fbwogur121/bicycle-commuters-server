@@ -4,13 +4,11 @@ import lombok.RequiredArgsConstructor
 import org.springframework.stereotype.Service
 import org.springframework.web.util.UriComponentsBuilder
 import java.io.BufferedReader
+import java.io.InputStreamReader
 import java.io.UnsupportedEncodingException
+import java.net.HttpURLConnection
 import java.net.MalformedURLException
 import java.net.URISyntaxException
-import java.net.URLEncoder
-
-import java.io.InputStreamReader
-import java.net.HttpURLConnection
 import java.net.URL
 import java.util.stream.Collectors
 
@@ -18,24 +16,9 @@ import java.util.stream.Collectors
 @Service
 @RequiredArgsConstructor
 class LoginService {
-    @Throws(URISyntaxException::class, MalformedURLException::class, UnsupportedEncodingException::class)
-    fun getNaverAuthorizeUrl(type: String): String {
-        val baseUrl = "https://nid.naver.com/oauth2.0/authorize"
-        val clientId = "KsYEPMXctpGK6qPFxnbF"
-        val redirectUrl = "http://localhost:8080/oauth/login"
-        val uriComponents = UriComponentsBuilder
-            .fromUriString(baseUrl)
-            .queryParam("response_type", "code")
-            .queryParam("client_id", clientId)
-            .queryParam("redirect_uri", URLEncoder.encode(redirectUrl, "UTF-8"))
-            .queryParam("state", URLEncoder.encode("123", "UTF-8"))
-            .build()
-        val finalUrl = uriComponents.toString()
-        return finalUrl
-    }
 
     @Throws(URISyntaxException::class, MalformedURLException::class, UnsupportedEncodingException::class)
-    fun getNaverTokenUrl(callback: NaverCallback): String? {
+    fun getNaverTokenUrl(code: String, state: String): String? {
         val baseUrl = "https://nid.naver.com/oauth2.0/token"
         val clientId = "KsYEPMXctpGK6qPFxnbF"
         val clientSecret = "_fmpPupJcu"
@@ -45,14 +28,15 @@ class LoginService {
                 .queryParam("grant_type", "authorization_code")
                 .queryParam("client_id", clientId)
                 .queryParam("client_secret", clientSecret)
-                .queryParam("code", callback.code)
-                .queryParam("state", callback.state)
+                .queryParam("code", code)
+                .queryParam("state", state)
                 .build().encode().toUri()
 
+        println(uriComponents)
         return try {
             val url = URL(uriComponents.toString())
             val con = url.openConnection() as HttpURLConnection
-            con.requestMethod = "POST" // 토큰 요청은 POST 메서드를 사용해야 합니다.
+            con.requestMethod = "GET"
 
             val responseCode = con.responseCode
             if (responseCode == HttpURLConnection.HTTP_OK) { // 정상 호출
