@@ -36,7 +36,7 @@ class LoginService {
         return try {
             val url = URL(uriComponents.toString())
             val con = url.openConnection() as HttpURLConnection
-            con.requestMethod = "GET"
+            con.requestMethod = "POST" // 토큰 요청은 POST 메서드를 사용해야 합니다.
 
             val responseCode = con.responseCode
             if (responseCode == HttpURLConnection.HTTP_OK) { // 정상 호출
