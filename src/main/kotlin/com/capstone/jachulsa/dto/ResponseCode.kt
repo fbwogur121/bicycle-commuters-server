@@ -31,7 +31,7 @@ enum class ResponseCode(
 
 
     // 401 Unauthorized
-    UNAUTHORIZED_USER_NOT_FOUND(HttpStatus.UNAUTHORIZED,2100, "접근 권한이 없는 사용자입니다."),
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED,2100, "접근 권한이 없습니다."),
     INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED,2101, "유효한 토큰이 아닙니다."),
     EXPIRED_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED,2102, "액세스 토큰이 만료되었습니다."),
 
