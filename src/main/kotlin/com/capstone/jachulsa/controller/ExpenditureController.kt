@@ -39,8 +39,7 @@ class ExpenditureController(private val service: ExpenditureService) {
     }
 
     //GET /expenditure: 지출 기록 조회
-    //userId- pathaVariable으로 받아서
-    //조회 기간 QueryString 필요, 페이징 처리 필요, 내 지출 기록만 조회 할건지 QueryString 필요. JWT 필요
+    // 페이징 처리 필요, JWT 필요
     @GetMapping("/{userId}")
     @Operation(summary = "지출 기록 조회", description = "지출 기록을 페이징 처리 후 반환, 페이지수는 0부터 !!")
     @Parameters(Parameter(name = "page", description = "페이지 수"),
