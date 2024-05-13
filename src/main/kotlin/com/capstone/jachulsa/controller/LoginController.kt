@@ -1,22 +1,14 @@
 package com.capstone.jachulsa.controller
 
+import com.capstone.jachulsa.service.LoginRequest
 import com.capstone.jachulsa.service.LoginService
-import com.capstone.jachulsa.service.NaverCallback
 import com.capstone.jachulsa.service.NaverRes
 import com.capstone.jachulsa.service.NaverToken
-import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.servlet.http.HttpServletRequest
-import jakarta.servlet.http.HttpServletResponse
-import lombok.*
-import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.bind.annotation.RestController
+import lombok.RequiredArgsConstructor
+import org.springframework.web.bind.annotation.*
 import java.io.UnsupportedEncodingException
 import java.net.MalformedURLException
 import java.net.URISyntaxException
@@ -24,46 +16,26 @@ import java.net.URISyntaxException
 @Tag(name = "Naver login API", description = "네이버로그인 api")
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/oauth")
 class LoginController(
         private val loginService: LoginService
 ) {
 
-    @Operation(summary = "authorize token 발급, /oauth/login 으로 redirect api")
-    @GetMapping("/naver-login")
+    @Operation(summary = "naver user 정보 return api")
+    @GetMapping()
+    @ResponseBody
     @Throws(
         MalformedURLException::class,
         UnsupportedEncodingException::class,
         URISyntaxException::class
     )
-    fun naverLogin(request: HttpServletRequest?, response: HttpServletResponse) {
-
-        val url: String = loginService.getNaverAuthorizeUrl("authorize")
-        println(url)
-        try {
-            response.sendRedirect(url)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    @Operation(summary = "naver user 정보 return api")
-    @GetMapping("/oauth/login")
-    @ResponseBody
-    @Throws(
-            MalformedURLException::class,
-            UnsupportedEncodingException::class,
-            URISyntaxException::class
-    )
-    fun callBack(
-            request: HttpServletRequest?,
-            response: HttpServletResponse?,
-            @RequestParam("code") code: String,
-            @RequestParam("state") state: String,
-            @RequestParam(value = "error", required = false) error: String?,
-            @RequestParam(value = "error_description", required = false) errorDescription: String?
+    fun authLogin(
+        @RequestBody loginRequest: LoginRequest
     ): String {
-        val callback = NaverCallback(code, state, error, errorDescription)
-        val responseToken: String? = loginService.getNaverTokenUrl(callback)
+        println("Received code: ${loginRequest.code}")
+        println("Received state: ${loginRequest.state}")
+        val responseToken: String? = loginService.getNaverTokenUrl(loginRequest.code, loginRequest.state)
+        println(responseToken)
         return if (responseToken != null) {
             val mapper = ObjectMapper()
             val token: NaverToken = mapper.readValue(responseToken, NaverToken::class.java)
