@@ -11,6 +11,7 @@ enum class ResponseCode(
     /**
     success - 1000~
      */
+    USER_OAUTH2_SUCCESS(HttpStatus.CREATED,1002,"oauth2 success"),
 
     USER_LOGIN_SUCCESS(HttpStatus.CREATED,1010,"login success"),
 
