@@ -2,7 +2,9 @@ package com.capstone.jachulsa.controller
 
 import com.capstone.jachulsa.domain.User
 import com.capstone.jachulsa.repository.UserRepository
+import com.capstone.jachulsa.service.JwtTokenProvider
 import com.capstone.jachulsa.service.UserService
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -88,5 +90,23 @@ class UserController(
     fun activateUser(@RequestBody request: Map<String, String>): User {
         val email = request["email"] ?: throw Exception("Email is required")
         return userService.activateUser(email)
+    }
+
+
+    // POST /users/verify : JWT 토큰 검증 및 이메일 추출
+    @PostMapping("/verify")
+    fun verifyTokenAndGetEmail(@RequestBody request: Map<String, String>): ResponseEntity<Any> {
+        val token = request["token"] ?: return ResponseEntity.badRequest().body(mapOf("error" to "토큰이 요청 본문에 없습니다."))
+
+        if (JwtTokenProvider.validateJwt(token)) {
+            val email = JwtTokenProvider.getEmailFromJwt(token)
+            return if (email != null) {
+                ResponseEntity.ok(mapOf("email" to email))
+            } else {
+                ResponseEntity.badRequest().body(mapOf("error" to "토큰에서 이메일을 추출할 수 없습니다."))
+            }
+        } else {
+            return ResponseEntity.status(401).body(mapOf("error" to "유효하지 않은 토큰입니다."))
+        }
     }
 }

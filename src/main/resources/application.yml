@@ -1,29 +1,3 @@
-##spring:
-##  application:
-##    name: jachulsa
-##  data:
-##    mongodb:
-##      uri: mongodb+srv://Ryu:jachulsa2024@jachulsacluster2.malfpfb.mongodb.net/JachulsaDB?retryWrites=true&w=majority
-##custom:
-##  oauth2:
-##    registration:
-##      naver:
-##        client-id: KsYEPMXctpGK6qPFxnbF
-##        client-secret: _fmpPupJcu
-##
-##springdoc:
-##  packages-to-scan: com.capstone.jachulsa.controller
-##  default-consumes-media-type: application/json;charset=UTF-8
-##  default-produces-media-type: application/json;charset=UTF-8
-##  swagger-ui:
-##    path: /
-##    disable-swagger-default-url: true
-##    display-request-duration: true
-##    operations-sorter: alpha
-##
-##server:
-##  port: 8080
-
 spring:
   application:
     name: jachulsa
@@ -66,25 +40,5 @@ springdoc:
 server:
   port: 8080
 
-#spring:
-#  datasource:
-#    url: jdbc:mysql://jachulsa-dev.cxg62sq0il59.ap-northeast-2.rds.amazonaws.com:3306/JachulsaDB
-#    username: root
-#    password: jachulsa2024!!
-#    hikari:
-#      driver-class-name: com.mysql.cj.jdbc.Driver
-#  sql:
-#    init:
-#      mode: never
-#  jpa:
-#    properties:
-#      hibernate:
-#        dialect: org.hibernate.dialect.MySQL8Dialect
-#        show_sql: true
-#        format_sql: true
-#        use_sql_comments: true
-#        hbm2ddl:
-#          auto: create
-#        default_batch_fetch_size: 1000
-#server:
-#  port: 8080
+jwt:
+  secret-key: "DbcT5FPcHLNjux6DWGfDR37LIe3PS2wAu3H7uImktWM"
