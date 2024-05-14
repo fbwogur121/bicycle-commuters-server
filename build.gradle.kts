@@ -39,6 +39,11 @@ dependencies {
 	implementation ("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2") //springboot version 3 이상
 	//implementation("org.springdoc:springdoc-openapi-ui:1.6.11") //springboot version 3 이하
 
+	//jwt
+	implementation("io.jsonwebtoken:jjwt-api:0.11.2")
+	implementation("io.jsonwebtoken:jjwt-impl:0.11.2")
+	implementation("io.jsonwebtoken:jjwt-jackson:0.11.2")
+
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
 
