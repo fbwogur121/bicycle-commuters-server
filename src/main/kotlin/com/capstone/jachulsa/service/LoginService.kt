@@ -105,7 +105,7 @@ class LoginService(private val userRepository: UserRepository) {
                     birthyear = naverUser.response.birthyear,
                     is_active = true,
                     is_public = true,
-                    address = null, // address 필드에 대한 값을 명시적으로 지정
+                    address = null,
                     total_riding = null
             )
             userRepository.save(newUser)
