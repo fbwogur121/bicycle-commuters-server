@@ -30,24 +30,24 @@ class UserController(
         return repository.save(user)
     }
 
-    // PUT /users{id} : 주어진 ID를 가진 사용자의 정보를 업데이트
-    @PutMapping("/{id}")
-    fun updateUser(@PathVariable id: String, @RequestBody updatedUser: User): User {
-        return repository.findById(id).map { existingUser ->
-            val updated: User = existingUser.copy(
-                    email = updatedUser.email,
-                    name = updatedUser.name,
-                    nickname = updatedUser.nickname,
-                    sex = updatedUser.sex,
-                    birthdate = updatedUser.birthdate,
-                    is_active = updatedUser.is_active,
-                    is_public = updatedUser.is_public,
-                    address = updatedUser.address,
-                    total_riding = updatedUser.total_riding
-            )
-            repository.save(updated)
-        }.orElseThrow { Exception("User not found") }
-    }
+//    // PUT /users{id} : 주어진 ID를 가진 사용자의 정보를 업데이트
+//    @PutMapping("/{id}")
+//    fun updateUser(@PathVariable id: String, @RequestBody updatedUser: User): User {
+//        return repository.findById(id).map { existingUser ->
+//            val updated: User = existingUser.copy(
+//                    email = updatedUser.email,
+//                    name = updatedUser.name,
+//                    nickname = updatedUser.nickname,
+//                    sex = updatedUser.sex,
+//                    birthdate = updatedUser.birthdate,
+//                    is_active = updatedUser.is_active,
+//                    is_public = updatedUser.is_public,
+//                    address = updatedUser.address,
+//                    total_riding = updatedUser.total_riding
+//            )
+//            repository.save(updated)
+//        }.orElseThrow { Exception("User not found") }
+//    }
 
     // DELETE /users/{id}: 주어진 ID를 가진 사용자 삭제
     @DeleteMapping("/{id}")
