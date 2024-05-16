@@ -34,6 +34,7 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+	implementation("jakarta.annotation:jakarta.annotation-api:2.0.0")
 
 	//swagger
 	implementation ("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2") //springboot version 3 이상
