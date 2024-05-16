@@ -12,25 +12,23 @@ import org.springframework.stereotype.Service
 import java.time.LocalDate
 
 @Service
-class ExpenditureService(private val expenditureRepository: ExpenditureRepository,private val userRepository: UserRepository) {
+class ExpenditureService(private val expenditureRepository: ExpenditureRepository, private val userRepository: UserRepository) {
 
-    fun createExpenditure(expenditure: Expenditure): ObjectId? {
+    fun createExpenditure(expenditure: Expenditure): Expenditure {
         val user = userRepository.findById(expenditure.userId)
             .orElseThrow { CustomException(ResponseCode.USER_NOT_FOUND) }
-        return expenditureRepository.save(expenditure).expenditureId
+        return expenditureRepository.save(expenditure)
     }
 
     fun getExpenditures(
         userId: String,
-        startDate: LocalDate,
-        endDate: LocalDate,
         pageable: Pageable
     ): Page<Expenditure> {
 
         val user = userRepository.findById(userId)
             .orElseThrow { CustomException(ResponseCode.USER_NOT_FOUND) }
 
-        val expenditures = expenditureRepository.findByUserIdAndDateBetween(userId, startDate, endDate, pageable)
+        val expenditures = expenditureRepository.findByUserId(userId, pageable)
         if (expenditures.isEmpty) {
             throw CustomException(ResponseCode.EXPENDITURE_NOT_FOUND)
         }

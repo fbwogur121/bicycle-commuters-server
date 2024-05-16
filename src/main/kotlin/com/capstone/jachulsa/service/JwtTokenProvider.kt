@@ -16,22 +16,10 @@ import java.security.Key
 
 @Service
 object JwtTokenProvider {
-    //private const val SECRET_KEY = "mySecretKey"
     private val SECRET_KEY: Key = Keys.secretKeyFor(SignatureAlgorithm.HS256) // 안전한 키 생성
     private const val EXPIRATION_TIME_MS = 864_000_000 // 10일(ms 단위)
 
     // JWT 생성
-//    fun generateJwt(email: String): String {
-//        val expirationDate = Date(System.currentTimeMillis() + EXPIRATION_TIME_MS)
-//        val signingKey = Keys.hmacShaKeyFor(SECRET_KEY.toByteArray())
-//
-//        return Jwts.builder()
-//                .setSubject(email)
-//                .setExpiration(expirationDate)
-//                .signWith(signingKey, SignatureAlgorithm.HS256)
-//                .compact()
-//    }
-
     fun generateJwt(email: String): String {
         val expirationDate = Date(System.currentTimeMillis() + EXPIRATION_TIME_MS)
 
@@ -43,14 +31,6 @@ object JwtTokenProvider {
     }
 
     // JWT 유효성 검사
-//    fun validateJwt(token: String): Boolean {
-//        return try {
-//            Jwts.parserBuilder().setSigningKey(SECRET_KEY.toByteArray()).build().parseClaimsJws(token)
-//            true
-//        } catch (e: Exception) {
-//            false
-//        }
-//    }
     fun validateJwt(token: String): Boolean {
         return try {
             Jwts.parserBuilder().setSigningKey(SECRET_KEY).build().parseClaimsJws(token)
@@ -61,18 +41,12 @@ object JwtTokenProvider {
     }
 
     // JWT에서 email 추출
-//    fun getEmailFromJwt(token: String): String? {
-//        return try {
-//            val claims = Jwts.parserBuilder().setSigningKey(SECRET_KEY.toByteArray()).build().parseClaimsJws(token).body
-//            claims.subject
-//        } catch (e: Exception) {
-//            null
-//        }
-//    }
     fun getEmailFromJwt(token: String): String? {
         return try {
             val claims = Jwts.parserBuilder().setSigningKey(SECRET_KEY).build().parseClaimsJws(token).body
-            claims.subject
+//            claims.subject
+            claims["email"]?.toString()
+
         } catch (e: Exception) {
             null
         }
