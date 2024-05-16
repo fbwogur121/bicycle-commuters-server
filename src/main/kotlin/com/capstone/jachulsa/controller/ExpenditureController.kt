@@ -48,16 +48,16 @@ class ExpenditureController(private val service: ExpenditureService) {
             Parameter(name = "size", description = "페이징 사이즈"))
     fun getExpenditure(
             @PathVariable userId: String,
-            @RequestHeader("Bearer") token: String,
+//            @RequestHeader("Bearer") token: String,
             @RequestParam("page") page: Int,
             @RequestParam("size") size: Int
     ): ApiResponse<ExpenditureListResponse> {
 
-        val email: String? = if (JwtTokenProvider.validateJwt(token)) {
-            JwtTokenProvider.getEmailFromJwt(token)
-        } else {
-            throw CustomException(ResponseCode.INVALID_ACCESS_TOKEN)
-        }
+//        val email: String? = if (JwtTokenProvider.validateJwt(token)) {
+//            JwtTokenProvider.getEmailFromJwt(token)
+//        } else {
+//            throw CustomException(ResponseCode.INVALID_ACCESS_TOKEN)
+//        }
 
         val pageable: Pageable = PageRequest.of(page, size, Sort.by("date").descending())
         val expendituresPage = service.getExpenditures(userId, pageable)

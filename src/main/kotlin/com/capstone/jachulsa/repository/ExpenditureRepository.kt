@@ -11,6 +11,6 @@ interface ExpenditureRepository :MongoRepository<Expenditure, String>{
 
     fun findByUserId(userId: String, pageable: Pageable) : Page<Expenditure>
 
-    fun findByEmail(email: String, pageable: Pageable) : Page<Expenditure>
+//    fun findByEmail(email: String, pageable: Pageable) : Page<Expenditure>
 
 }
