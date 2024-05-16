@@ -21,7 +21,7 @@ class LoginController(
 ) {
 
     @Operation(summary = "naver user 정보 return api")
-    @GetMapping()
+    @PostMapping()
     @ResponseBody
     @Throws(
             MalformedURLException::class,
