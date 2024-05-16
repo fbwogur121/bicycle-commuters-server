@@ -10,4 +10,7 @@ interface ExpenditureRepository :MongoRepository<Expenditure, String>{
     fun findByUserIdAndDateBetween(userId: String, startDate: LocalDate, endDate: LocalDate, pageable: Pageable): Page<Expenditure>
 
     fun findByUserId(userId: String, pageable: Pageable) : Page<Expenditure>
+
+    fun findByEmail(email: String, pageable: Pageable) : Page<Expenditure>
+
 }
