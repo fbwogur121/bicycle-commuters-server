@@ -15,6 +15,7 @@ data class NaverRes @JsonCreator constructor(
             @JsonProperty("gender") val gender: String,
             @JsonProperty("email") val email: String,
             @JsonProperty("name") val name: String,
+            @JsonProperty("profile_image") val profileImage: String?,
             @JsonProperty("birthday") val birthday: String,
             @JsonProperty("birthyear") val birthyear: String
     )

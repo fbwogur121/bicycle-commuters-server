@@ -1,9 +1,8 @@
 package com.capstone.jachulsa.domain
 
-import org.springframework.cglib.core.Local
-import org.springframework.data.mongodb.core.mapping.Document
-import java.time.LocalDate
 import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.mapping.Document
+
 @Document(collection = "User")
 data class User(
         @Id
@@ -15,6 +14,7 @@ data class User(
         val name: String?,
         val birthday: String?,
         val birthyear: String?,
+        val profileImage: String?,
         val is_active: Boolean? = true,
         val is_public: Boolean? = true,
         val address: Address?,

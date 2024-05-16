@@ -1,9 +1,7 @@
 package com.capstone.jachulsa.controller
 
-import com.capstone.jachulsa.service.LoginRequest
-import com.capstone.jachulsa.service.LoginService
-import com.capstone.jachulsa.service.NaverRes
-import com.capstone.jachulsa.service.NaverToken
+import com.capstone.jachulsa.dto.ResponseCode
+import com.capstone.jachulsa.service.*
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -13,8 +11,6 @@ import org.springframework.web.bind.annotation.*
 import java.io.UnsupportedEncodingException
 import java.net.MalformedURLException
 import java.net.URISyntaxException
-import com.capstone.jachulsa.dto.ResponseCode
-import com.capstone.jachulsa.service.JwtTokenProvider
 
 @Tag(name = "Naver login API", description = "네이버로그인 api")
 @RestController
@@ -25,7 +21,7 @@ class LoginController(
 ) {
 
     @Operation(summary = "naver user 정보 return api")
-    @GetMapping()
+    @PostMapping()
     @ResponseBody
     @Throws(
             MalformedURLException::class,
@@ -53,6 +49,7 @@ class LoginController(
                 println(naverUser.response.name)
                 println(naverUser.response.birthday)
                 println(naverUser.response.birthyear)
+                println(naverUser.response.profileImage)
                 val user = loginService.findOrCreateUser(naverUser.response.email, naverUser)
                 val jwt = JwtTokenProvider.generateJwt(naverUser.response.email)
                 val responseBody = mapOf(
