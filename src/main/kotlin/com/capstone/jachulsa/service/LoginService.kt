@@ -6,31 +6,20 @@ import org.springframework.web.util.UriComponentsBuilder
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.UnsupportedEncodingException
-import java.net.*
+import java.net.HttpURLConnection
+import java.net.MalformedURLException
+import java.net.URISyntaxException
+import java.net.URL
 import java.util.stream.Collectors
-
+import com.capstone.jachulsa.repository.UserRepository
+import com.capstone.jachulsa.domain.User
 
 @Service
 @RequiredArgsConstructor
-class LoginService {
-    @Throws(URISyntaxException::class, MalformedURLException::class, UnsupportedEncodingException::class)
-    fun getNaverAuthorizeUrl(type: String): String {
-        val baseUrl = "https://nid.naver.com/oauth2.0/authorize"
-        val clientId = "KsYEPMXctpGK6qPFxnbF"
-        val redirectUrl = "http://localhost:8080/oauth/login"
-        val uriComponents = UriComponentsBuilder
-            .fromUriString(baseUrl)
-            .queryParam("response_type", "code")
-            .queryParam("client_id", clientId)
-            .queryParam("redirect_uri", URLEncoder.encode(redirectUrl, "UTF-8"))
-            .queryParam("state", URLEncoder.encode("123", "UTF-8"))
-            .build()
-        val finalUrl = uriComponents.toString()
-        return finalUrl
-    }
+class LoginService(private val userRepository: UserRepository) {
 
     @Throws(URISyntaxException::class, MalformedURLException::class, UnsupportedEncodingException::class)
-    fun getNaverTokenUrl(callback: NaverCallback): String? {
+    fun getNaverTokenUrl(code: String, state: String): String? {
         val baseUrl = "https://nid.naver.com/oauth2.0/token"
         val clientId = "KsYEPMXctpGK6qPFxnbF"
         val clientSecret = "_fmpPupJcu"
@@ -40,10 +29,11 @@ class LoginService {
                 .queryParam("grant_type", "authorization_code")
                 .queryParam("client_id", clientId)
                 .queryParam("client_secret", clientSecret)
-                .queryParam("code", callback.code)
-                .queryParam("state", callback.state)
+                .queryParam("code", code)
+                .queryParam("state", state)
                 .build().encode().toUri()
 
+        println(uriComponents)
         return try {
             val url = URL(uriComponents.toString())
             val con = url.openConnection() as HttpURLConnection
@@ -96,5 +86,29 @@ class LoginService {
             e.printStackTrace()
         }
         return null
+    }
+
+    fun findOrCreateUser(email: String, naverUser: NaverRes): User {
+        // 데이터베이스에서 이메일로 사용자 조회
+        val existingUser = userRepository.findByEmail(email).firstOrNull()
+        return if (existingUser != null) {
+            existingUser // 사용자가 이미 존재하면 반환
+        } else {
+            // 존재하지 않으면 새로운 사용자 생성
+            val newUser = User(
+                    nickname = naverUser.response.nickname,
+                    age = naverUser.response.age,
+                    gender = naverUser.response.gender,
+                    email = email,
+                    name = naverUser.response.name,
+                    birthday = naverUser.response.birthday,
+                    birthyear = naverUser.response.birthyear,
+                    is_active = true,
+                    is_public = true,
+                    address = null,
+                    total_riding = null
+            )
+            userRepository.save(newUser)
+        }
     }
 }
