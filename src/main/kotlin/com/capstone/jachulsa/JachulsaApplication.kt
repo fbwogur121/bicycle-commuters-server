@@ -28,6 +28,7 @@ fun init(repository: UserRepository): CommandLineRunner {
 			name = "Test User",
 			birthday = "12-13",
 			birthyear = "2001",
+			profileImage = "http://profileImageTest.jpg",
 			is_active = true,
 			is_public = true,
 			address = Address(city = "Seoul", detail_address = "123-456"),

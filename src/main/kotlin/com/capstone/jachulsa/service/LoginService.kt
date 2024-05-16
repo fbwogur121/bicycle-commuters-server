@@ -1,5 +1,7 @@
 package com.capstone.jachulsa.service
 
+import com.capstone.jachulsa.domain.User
+import com.capstone.jachulsa.repository.UserRepository
 import lombok.RequiredArgsConstructor
 import org.springframework.stereotype.Service
 import org.springframework.web.util.UriComponentsBuilder
@@ -11,8 +13,6 @@ import java.net.MalformedURLException
 import java.net.URISyntaxException
 import java.net.URL
 import java.util.stream.Collectors
-import com.capstone.jachulsa.repository.UserRepository
-import com.capstone.jachulsa.domain.User
 
 @Service
 @RequiredArgsConstructor
@@ -103,6 +103,7 @@ class LoginService(private val userRepository: UserRepository) {
                     name = naverUser.response.name,
                     birthday = naverUser.response.birthday,
                     birthyear = naverUser.response.birthyear,
+                    profileImage = naverUser.response.profileImage,
                     is_active = true,
                     is_public = true,
                     address = null,
