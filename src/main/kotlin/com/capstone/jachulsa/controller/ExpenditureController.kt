@@ -23,14 +23,6 @@ import java.time.LocalDate
 @RequestMapping("/expenditure")
 class ExpenditureController(private val service: ExpenditureService, private val jwtTokenProvider: JwtTokenProvider) {
 
-    @PostMapping("/jwt")
-    fun createJwt(@RequestBody jwtRequest: JwtRequest): String {
-        return jwtTokenProvider.generateJwt(jwtRequest.email)
-    }
-
-    data class JwtRequest(val email: String)
-
-
     // POST expenditure : 지출 생성
     @Operation(summary = "지출 생성", description = "해당 유저의 지출 기록 생성")
     @PostMapping
