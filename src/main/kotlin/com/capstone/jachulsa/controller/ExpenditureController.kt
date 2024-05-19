@@ -21,16 +21,29 @@ import java.time.LocalDate
 @Tag(name = "Expenditure API", description = "지출 API")
 @RestController
 @RequestMapping("/expenditure")
-class ExpenditureController(private val service: ExpenditureService) {
+class ExpenditureController(private val service: ExpenditureService, private val jwtTokenProvider: JwtTokenProvider) {
+
+    @PostMapping("/jwt")
+    fun createJwt(@RequestBody jwtRequest: JwtRequest): String {
+        return jwtTokenProvider.generateJwt(jwtRequest.email)
+    }
+
+    data class JwtRequest(val email: String)
+
 
     // POST expenditure : 지출 생성
     @Operation(summary = "지출 생성", description = "해당 유저의 지출 기록 생성")
     @PostMapping
-    fun createExpenditure(@Validated @RequestBody request: ExpenditureRequest): ApiResponse<ExpenditureResponse> {
-        val expenditure = service.createExpenditure(request.toExpenditure())
+    fun createExpenditure(@Validated @RequestBody request: ExpenditureRequest,
+                          @Validated @RequestHeader("Bearer") token: String, //토큰없으면 오류 보내야됨
+    ): ApiResponse<ExpenditureResponse> {
+
+        val email: String = jwtTokenProvider.getEmailFromJwt(token)
+
+        val expenditure = service.createExpenditure(request.toExpenditure(email))
         val expenditureResponse = ExpenditureResponse(
                 expenditureId = expenditure.expenditureId.toString(),
-                userId = expenditure.userId,
+                email = expenditure.email,
                 expenditureType = expenditure.expenditureType,
                 expenditureAmountWon = expenditure.expenditureAmountWon,
                 date = expenditure.date,
@@ -40,50 +53,47 @@ class ExpenditureController(private val service: ExpenditureService) {
         return ApiResponse.success(ResponseCode.CREATE_SUCCESS, expenditureResponse)
     }
 
-    //GET /expenditure: 지출 기록 조회
-    // 페이징 처리 필요, JWT 필요
-    @GetMapping("/{userId}")
+//    //GET /expenditure: 지출 기록 조회
+//    // 페이징 처리 필요, JWT 필요
+    @GetMapping
     @Operation(summary = "지출 기록 조회", description = "지출 기록을 페이징 처리 후 반환, 페이지수는 0부터 !!")
     @Parameters(Parameter(name = "page", description = "페이지 수"),
             Parameter(name = "size", description = "페이징 사이즈"))
     fun getExpenditure(
-            @PathVariable userId: String,
-//            @RequestHeader("Bearer") token: String,
+            @RequestHeader("Bearer") token: String,
             @RequestParam("page") page: Int,
             @RequestParam("size") size: Int
-    ): ApiResponse<ExpenditureListResponse> {
+    ): ApiResponse<ExpenditureListResponse?> {
 
-//        val email: String? = if (JwtTokenProvider.validateJwt(token)) {
-//            JwtTokenProvider.getEmailFromJwt(token)
-//        } else {
-//            throw CustomException(ResponseCode.INVALID_ACCESS_TOKEN)
-//        }
+        val email: String = jwtTokenProvider.getEmailFromJwt(token)
 
         val pageable: Pageable = PageRequest.of(page, size, Sort.by("date").descending())
-        val expendituresPage = service.getExpenditures(userId, pageable)
-        val expenditures = expendituresPage.content.map { expenditure ->
+        val expendituresPage = email?.let { service.getExpenditures(it, pageable) }
+        val expenditures = expendituresPage?.content?.map { expenditure ->
             ExpenditureResponse(
                     expenditureId = expenditure.expenditureId.toString(),
-                    userId = expenditure.userId,
+                    email = expenditure.email,
                     expenditureType = expenditure.expenditureType,
                     expenditureAmountWon = expenditure.expenditureAmountWon,
                     date = expenditure.date,
                     note = expenditure.note
             )
         }
-        val expenditureListResponse = ExpenditureListResponse(
-                expenditures = expenditures,
+        val expenditureListResponse = expenditures?.let {
+            ExpenditureListResponse(
+                expenditures = it,
                 currentPage = expendituresPage.number + 1,
                 totalPages = expendituresPage.totalPages,
                 totalItems = expendituresPage.totalElements
         )
+        }
 
         return ApiResponse.success(ResponseCode.READ_SUCCESS, expenditureListResponse)
     }
 
     data class ExpenditureResponse(
         val expenditureId: String? = null,
-        val userId: String? = null,
+        val email: String? = null,
         val expenditureType: ExpenditureType? = null,
         val expenditureAmountWon: Int? = null,
         val date: LocalDate? = null,

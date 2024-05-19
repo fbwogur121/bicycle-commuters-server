@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.exc.MismatchedInputException
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.MethodArgumentNotValidException
+import org.springframework.web.bind.MissingRequestHeaderException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
@@ -63,6 +64,10 @@ class GlobalExceptionHandler {
         return ErrorResponse.toResponseEntity(ResponseCode.RESOURCE_NOT_FOUND)
     }
 
+    @ExceptionHandler(MissingRequestHeaderException::class)
+    fun handleMissingRequestHeaderException(e:MissingRequestHeaderException): ResponseEntity<ErrorResponse>{
+        return ErrorResponse.toResponseEntity(ResponseCode.MISSING_HEADER)
+    }
 
     // 잘못된 요청 처리
     @ExceptionHandler(NoHandlerFoundException::class)

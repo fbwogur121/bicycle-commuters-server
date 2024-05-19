@@ -15,20 +15,18 @@ import java.time.LocalDate
 class ExpenditureService(private val expenditureRepository: ExpenditureRepository, private val userRepository: UserRepository) {
 
     fun createExpenditure(expenditure: Expenditure): Expenditure {
-        val user = userRepository.findById(expenditure.userId)
-            .orElseThrow { CustomException(ResponseCode.USER_NOT_FOUND) }
+        userRepository.findOneByEmail(expenditure.email) ?: throw CustomException(ResponseCode.USER_NOT_FOUND)
         return expenditureRepository.save(expenditure)
     }
 
     fun getExpenditures(
-        userId: String,
+        email: String,
         pageable: Pageable
     ): Page<Expenditure> {
 
-        val user = userRepository.findById(userId)
-            .orElseThrow { CustomException(ResponseCode.USER_NOT_FOUND) }
+        userRepository.findOneByEmail(email) ?: throw CustomException(ResponseCode.USER_NOT_FOUND)
 
-        val expenditures = expenditureRepository.findByUserId(userId, pageable)
+        val expenditures = expenditureRepository.findByEmail(email, pageable)
         if (expenditures.isEmpty) {
             throw CustomException(ResponseCode.EXPENDITURE_NOT_FOUND)
         }

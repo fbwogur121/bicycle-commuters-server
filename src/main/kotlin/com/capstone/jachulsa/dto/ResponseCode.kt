@@ -29,12 +29,15 @@ enum class ResponseCode(
     NOT_READABLE(HttpStatus.BAD_REQUEST,2001,"{mismatchedFieldNames} 필드가 누락되었거나 데이터 형식이 올바르지 않습니다."), //HttpMessageNotReadableException null,자료형
     NOT_NULL_FIELD(HttpStatus.BAD_REQUEST,2002," {fieldName} 필드의 입력값 [ rejectedValue ]이 유효하지 않습니다."), // MethodArgumentNotValidException (@VALID)
     TYPE_MISMATCHED(HttpStatus.BAD_REQUEST,2002," {fieldName} 필드의 입력값 [ rejectedValue ]의 형식이 올바르지 않습니다."), // MethodArgumentTypeMismatchException
+    MISSING_HEADER(HttpStatus.BAD_REQUEST,2003,"Bearer 헤더가 존재하지 않습니다."),
+
 
 
     // 401 Unauthorized
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED,2100, "접근 권한이 없습니다."),
     INVALID_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED,2101, "유효한 토큰이 아닙니다."),
     EXPIRED_ACCESS_TOKEN(HttpStatus.UNAUTHORIZED,2102, "액세스 토큰이 만료되었습니다."),
+    INVALID_EMAIL_CLAIM(HttpStatus.UNAUTHORIZED,2103,"email이 유효하지 않습니다."),
 
     // 403 Forbidden
     FORBIDDEN(HttpStatus.FORBIDDEN,2300,"권한이 없습니다."),

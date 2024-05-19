@@ -10,7 +10,7 @@ import java.time.LocalDate
 data class Expenditure(
         @Id
         val expenditureId: ObjectId? = null,
-        val userId: String,
+        val email: String,
         val expenditureType: ExpenditureType,
         val expenditureAmountWon: Int,
         val date: LocalDate,
