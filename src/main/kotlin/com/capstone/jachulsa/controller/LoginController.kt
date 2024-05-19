@@ -17,7 +17,8 @@ import java.net.URISyntaxException
 @RequiredArgsConstructor
 @RequestMapping("/oauth")
 class LoginController(
-        private val loginService: LoginService
+        private val loginService: LoginService,
+        private val jwtTokenProvider: JwtTokenProvider
 ) {
 
     @Operation(summary = "naver user 정보 return api")
@@ -51,7 +52,7 @@ class LoginController(
                 println(naverUser.response.birthyear)
                 println(naverUser.response.profileImage)
                 val user = loginService.findOrCreateUser(naverUser.response.email, naverUser)
-                val jwt = JwtTokenProvider.generateJwt(naverUser.response.email)
+                val jwt = jwtTokenProvider.generateJwt(naverUser.response.email)
                 val responseBody = mapOf(
                         "code" to ResponseCode.USER_OAUTH2_SUCCESS.code,
                         "message" to ResponseCode.USER_OAUTH2_SUCCESS.message,

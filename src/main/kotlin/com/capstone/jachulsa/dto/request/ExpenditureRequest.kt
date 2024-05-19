@@ -6,16 +6,16 @@ import jakarta.validation.constraints.NotBlank
 import java.time.LocalDate
 
 data class ExpenditureRequest(
-    @field:NotBlank(message = "2001")
-    val userId: String,
-    val expenditureType: ExpenditureType,
-    val expenditureAmountWon: Int,
-    val date: LocalDate,
-    val note: String?
+//    @field:NotBlank(message = "2001")
+//        var email: String?,
+        val expenditureType: ExpenditureType,
+        val expenditureAmountWon: Int,
+        val date: LocalDate,
+        val note: String?
 ) {
-    fun toExpenditure(): Expenditure {
+    fun toExpenditure(email: String): Expenditure {
         return Expenditure(
-            userId = this.userId,
+            email = email,
             expenditureType = this.expenditureType,
             expenditureAmountWon = this.expenditureAmountWon,
             date = this.date,
