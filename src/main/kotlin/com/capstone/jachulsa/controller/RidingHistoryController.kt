@@ -1,5 +1,6 @@
 package com.capstone.jachulsa.controller
 
+import com.capstone.jachulsa.domain.RidingHistory
 import com.capstone.jachulsa.domain.enumtype.Bike
 import com.capstone.jachulsa.domain.enumtype.RidingType
 import com.capstone.jachulsa.dto.ApiResponse
@@ -24,13 +25,6 @@ import java.time.LocalDate
 @RequestMapping
 class RidingHistoryController (private val service: RidingHistoryService, private val jwtTokenProvider: JwtTokenProvider){
 
-    @PostMapping("/jwt")
-    fun createJwt(@RequestBody jwtRequest: JwtRequest): String {
-        return jwtTokenProvider.generateJwt(jwtRequest.email)
-    }
-
-    data class JwtRequest(val email: String)
-
     // POST /riding : 라이딩 생성
     @Operation(summary = "라이딩 생성", description = "jwt 유저의 라이딩기록을 생성")
     @PostMapping("/riding")
@@ -41,33 +35,8 @@ class RidingHistoryController (private val service: RidingHistoryService, privat
         val email: String = jwtTokenProvider.getEmailFromJwt(token)
 
         val ridingHistory = service.createRidingHistory(request.toRidingHistory(email))
-        val ridingResponse = RidingResponse(
-                ridingId = ridingHistory.ridingHistoryId.toString(),
-                email=ridingHistory.email,
-                type=ridingHistory.type,
-                date = ridingHistory.date,
-                bike = ridingHistory.bike,
-                departures = DeparturesResponse(
-                        longitude = ridingHistory.departures.longitude,
-                        latitude = ridingHistory.departures.latitude,
-                        detailAddress = ridingHistory.departures.detailAddress
-                ),
-                arrivals = ArrivalsResponse(
-                        longitude = ridingHistory.arrivals.longitude,
-                        latitude = ridingHistory.arrivals.latitude,
-                        detailAddress = ridingHistory.arrivals.detailAddress
-                ),
-                stopover = ridingHistory.stopover?.let {
-                    StopoverResponse(
-                            longitude = it.longitude,
-                            latitude = it.latitude,
-                            detailAddress = it.detailAddress
-                    )
-                },
-                ridingMinutes = ridingHistory.ridingMinutes,
-                distanceMeters = ridingHistory.distanceMeters,
-                reduceAmountWon = ridingHistory.reduceAmountWon
-        )
+        val ridingResponse = mapToResponse(ridingHistory)
+
         return ApiResponse.success(ResponseCode.CREATE_SUCCESS, ridingResponse)
     }
 
@@ -89,40 +58,9 @@ class RidingHistoryController (private val service: RidingHistoryService, privat
     ): ApiResponse<RidingListResponse> {
 
         val email: String = jwtTokenProvider.getEmailFromJwt(token)
-
         val pageable: Pageable = PageRequest.of(page, size, Sort.by("date").descending())
-
         val ridingsPage = service.getRidings(email, myRidesOnly, pageable)
-
-        val ridings = ridingsPage.content.map { riding ->
-            RidingResponse(
-                    ridingId = riding.ridingHistoryId.toString(),
-                    email = riding.email, //**
-                    type = riding.type,
-                    date = riding.date,
-                    bike = riding.bike,
-                    departures = DeparturesResponse(
-                            longitude = riding.departures.longitude,
-                            latitude = riding.departures.latitude,
-                            detailAddress = riding.departures.detailAddress
-                    ),
-                    arrivals = ArrivalsResponse(
-                            longitude = riding.arrivals.longitude,
-                            latitude = riding.arrivals.latitude,
-                            detailAddress = riding.arrivals.detailAddress
-                    ),
-                    stopover = riding.stopover?.let {
-                        StopoverResponse(
-                                longitude = it.longitude,
-                                latitude = it.latitude,
-                                detailAddress = it.detailAddress
-                        )
-                    },
-                    ridingMinutes = riding.ridingMinutes,
-                    distanceMeters = riding.distanceMeters,
-                    reduceAmountWon = riding.reduceAmountWon
-            )
-        }
+        val ridings = ridingsPage.content.map { riding -> mapToResponse(riding) }
 
         val ridingListResponse = RidingListResponse(
                 currentPage = ridingsPage.number + 1, // Page number is zero-based
@@ -131,6 +69,24 @@ class RidingHistoryController (private val service: RidingHistoryService, privat
                 ridings = ridings
         )
 
+        return ApiResponse.success(ResponseCode.READ_SUCCESS, ridingListResponse)
+    }
+
+
+    //라이딩 상세조회 - 일자별로
+    @Operation(summary = "라이딩 상세 조회", description = "")
+    @GetMapping("/riding")
+    fun getRidingHistory(@Validated @RequestHeader("Bearer") token: String,
+                         @Validated @RequestParam("date") date: LocalDate // 날짜(YYYY-MM-DD 형식)
+    ): ApiResponse<RidingDateListResponse> {
+
+        val email: String = jwtTokenProvider.getEmailFromJwt(token)
+
+        val ridingList = service.getRidingsByDate(email, date)
+
+        val ridingListResponse = RidingDateListResponse(
+                ridings = ridingList.map { mapToResponse(it) }
+        )
         return ApiResponse.success(ResponseCode.READ_SUCCESS, ridingListResponse)
     }
 
@@ -158,58 +114,34 @@ class RidingHistoryController (private val service: RidingHistoryService, privat
 //        return ApiResponse.success(ResponseCode.READ_SUCCESS, RankingListResponse)
 //    }
 
-
-
-
-//    //라이딩 상세조회
-//    @Operation(summary = "라이딩 상세 조회", description = "")
-//    @GetMapping("/riding/{ridingId}")
-//    fun getRidingHistory(@PathVariable ridingId: String): ApiResponse<RidingResponse> {
-//        val ridingHistory = service.getRidingHistoryById(ridingId)
-//
-//        val departuresResponse = ridingHistory?.departures?.let { departures ->
-//            DeparturesResponse(
-//                longitude = departures.longitude,
-//                latitude = departures.latitude,
-//                detailAddress = departures.detailAddress
-//            )
-//        }
-//
-//        val arrivalsResponse = ridingHistory?.arrivals?.let { arrivals ->
-//            ArrivalsResponse(
-//                longitude = arrivals.longitude,
-//                latitude = arrivals.latitude,
-//                detailAddress = arrivals.detailAddress
-//            )
-//        }
-//
-//        val stopoverResponse = ridingHistory?.stopover?.let { stopover ->
-//            StopoverResponse(
-//                longitude = stopover.longitude,
-//                latitude = stopover.latitude,
-//                detailAddress = stopover.detailAddress
-//            )
-//        }
-//
-//        val ridingResponse = RidingResponse(
-//            ridingId = ridingHistory?.ridingHistoryId.toString(),
-//            userId = ridingHistory?.userId,
-//            type = ridingHistory?.type,
-//            date = ridingHistory?.date,
-//            bike = ridingHistory?.bike,
-//            departures = departuresResponse,
-//            arrivals = arrivalsResponse,
-//            stopover = stopoverResponse,
-//            ridingMinutes = ridingHistory?.ridingMinutes,
-//            distanceMeters = ridingHistory?.distanceMeters,
-//            reduceAmountWon = ridingHistory?.reduceAmountWon
-//        )
-//
-//        return ApiResponse.success(ResponseCode.READ_SUCCESS, ridingResponse)
-//    }
-
-
-
+    private fun mapToResponse(ridingHistory: RidingHistory): RidingResponse {
+        return RidingResponse(
+                ridingId = ridingHistory.ridingHistoryId.toString(),
+                email = ridingHistory.email,
+                type = ridingHistory.type,
+                date = ridingHistory.date,
+                bike = ridingHistory.bike,
+                departures = DeparturesResponse(
+                        longitude = ridingHistory.departures.longitude,
+                        latitude = ridingHistory.departures.latitude,
+                        detailAddress = ridingHistory.departures.detailAddress
+                ),
+                arrivals = ArrivalsResponse(
+                        longitude = ridingHistory.arrivals.longitude,
+                        latitude = ridingHistory.arrivals.latitude,
+                        detailAddress = ridingHistory.arrivals.detailAddress
+                ),
+                stopover = StopoverResponse(
+                            longitude = ridingHistory.stopover?.longitude,
+                            latitude = ridingHistory.stopover?.latitude,
+                            detailAddress = ridingHistory.stopover?.detailAddress
+                    )
+                ,
+                ridingMinutes = ridingHistory.ridingMinutes,
+                distanceMeters = ridingHistory.distanceMeters,
+                reduceAmountWon = ridingHistory.reduceAmountWon
+        )
+    }
 
     data class RidingResponse(
         val ridingId: String? = null,
@@ -249,6 +181,10 @@ class RidingHistoryController (private val service: RidingHistoryService, privat
         val totalPages: Int,
         val totalItems: Long,
         val ridings: List<RidingResponse>
+    )
+
+    data class RidingDateListResponse(
+            val ridings: List<RidingResponse>
     )
 
     data class RankingResponse(
