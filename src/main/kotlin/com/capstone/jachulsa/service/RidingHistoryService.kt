@@ -15,30 +15,24 @@ import java.time.LocalDate
 @Service
 class RidingHistoryService(private val ridingHistoryRepository: RidingHistoryRepository, private val userRepository: UserRepository) {
 
-    fun createRidingHistory(ridingHistory: RidingHistory): ObjectId?{
-        val user = userRepository.findById(ridingHistory.userId)
-            .orElseThrow { CustomException(ResponseCode.USER_NOT_FOUND) }
-        return ridingHistoryRepository.save(ridingHistory).ridingHistoryId
+    fun createRidingHistory(ridingHistory: RidingHistory): RidingHistory{
+        userRepository.findOneByEmail(ridingHistory.email) ?: throw CustomException(ResponseCode.USER_NOT_FOUND)
+        return ridingHistoryRepository.save(ridingHistory)
     }
 
 
     fun getRidings(
-        userId: String?,
-        startDate: LocalDate,
-        endDate: LocalDate,
+        email: String,
         myRidesOnly: Boolean,
         pageable: Pageable
     ): Page<RidingHistory> {
 
-        val user = userId?.let {
-            userRepository.findById(it)
-                .orElseThrow { CustomException(ResponseCode.USER_NOT_FOUND) }
-        }
+        userRepository.findOneByEmail(email) ?: throw CustomException(ResponseCode.USER_NOT_FOUND)
 
-        val rides: Page<RidingHistory> = if (userId != null && myRidesOnly) {
-            ridingHistoryRepository.findByUserIdAndDateBetween(userId, startDate, endDate, pageable)
+        val rides: Page<RidingHistory> = if (myRidesOnly) {
+            ridingHistoryRepository.findByEmail(email, pageable)
         } else {
-            ridingHistoryRepository.findByDateBetween(startDate, endDate, pageable)
+            ridingHistoryRepository.findAll(pageable)
         }
 
         if (rides.isEmpty) throw CustomException(ResponseCode.RIDING_NOT_FOUND)

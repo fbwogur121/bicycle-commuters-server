@@ -13,7 +13,7 @@ data class RidingHistory(
 
         @Id
         val ridingHistoryId: ObjectId? = null,
-        val userId: String,
+        val email: String,
         val type: RidingType,
         val date: LocalDate,
         val bike: Bike?,

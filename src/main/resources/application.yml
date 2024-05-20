@@ -66,6 +66,9 @@ springdoc:
 server:
   port: 8080
 
+jwt:
+  secret-key: "DbcT5FPcHLNjux6DWGfDR37LIe3PS2wAu3H7uImktWM"
+
 #spring:
 #  datasource:
 #    url: jdbc:mysql://jachulsa-dev.cxg62sq0il59.ap-northeast-2.rds.amazonaws.com:3306/JachulsaDB
