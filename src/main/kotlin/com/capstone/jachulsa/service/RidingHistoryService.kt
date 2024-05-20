@@ -40,9 +40,8 @@ class RidingHistoryService(private val ridingHistoryRepository: RidingHistoryRep
         return rides
     }
 
-    fun getRidingHistoryById(ridingId: String): RidingHistory? {
-        return ridingHistoryRepository.findById(ridingId).orElseThrow {
-            CustomException(ResponseCode.RIDING_NOT_FOUND)
-        }
-    }
+
+    fun getRidingsByDate(userId: String, date: LocalDate): List<RidingHistory> {
+        return ridingHistoryRepository.findByEmailAndDate(userId, date)?.takeIf { it.isNotEmpty() }
+                ?: throw CustomException(ResponseCode.RIDING_NOT_FOUND)    }
 }
