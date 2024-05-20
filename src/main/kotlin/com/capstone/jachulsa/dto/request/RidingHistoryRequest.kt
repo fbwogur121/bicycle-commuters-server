@@ -10,8 +10,8 @@ import jakarta.validation.constraints.NotBlank
 import java.time.LocalDate
 
 data class RidingHistoryRequest(
-    @field:NotBlank(message = "2001")
-    val userId: String,
+//    @field:NotBlank(message = "2001")
+//    val userId: String,
     val type: RidingType,
     val date: LocalDate,
     val bike: Bike?,
@@ -22,9 +22,9 @@ data class RidingHistoryRequest(
     val distanceMeters: Int,
     val reduceAmountWon: Int?
 ) {
-    fun toRidingHistory() : RidingHistory {
+    fun toRidingHistory(email: String) : RidingHistory {
         return RidingHistory(
-            userId = this.userId,
+            email = email,
             type = this.type,
             date = this.date,
             bike = this.bike,

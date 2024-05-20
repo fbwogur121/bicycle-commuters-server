@@ -27,7 +27,7 @@ class ExpenditureController(private val service: ExpenditureService, private val
     @Operation(summary = "지출 생성", description = "해당 유저의 지출 기록 생성")
     @PostMapping
     fun createExpenditure(@Validated @RequestBody request: ExpenditureRequest,
-                          @Validated @RequestHeader("Bearer") token: String, //토큰없으면 오류 보내야됨
+                          @Validated @RequestHeader("Bearer") token: String,
     ): ApiResponse<ExpenditureResponse> {
 
         val email: String = jwtTokenProvider.getEmailFromJwt(token)
