@@ -24,4 +24,7 @@ class UserService(private val userRepository: UserRepository) {
         val updatedUser = user.copy(is_active = true)
         return userRepository.save(updatedUser)
     }
+
+    fun findUserByEmail(email: String) = userRepository.findOneByEmail(email)
+
 }

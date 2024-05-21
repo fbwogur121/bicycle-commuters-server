@@ -8,6 +8,7 @@ import com.capstone.jachulsa.dto.ResponseCode
 import com.capstone.jachulsa.dto.request.RidingHistoryRequest
 import com.capstone.jachulsa.service.JwtTokenProvider
 import com.capstone.jachulsa.service.RidingHistoryService
+import com.capstone.jachulsa.service.UserService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.Parameters
@@ -23,7 +24,9 @@ import java.time.LocalDate
 @Tag(name = "RidingHistory API", description = "라이딩 API")
 @RestController
 @RequestMapping
-class RidingHistoryController (private val service: RidingHistoryService, private val jwtTokenProvider: JwtTokenProvider){
+class RidingHistoryController (private val ridingHistoryService: RidingHistoryService,
+                               private val userService: UserService,
+                               private val jwtTokenProvider: JwtTokenProvider){
 
     // POST /riding : 라이딩 생성
     @Operation(summary = "라이딩 생성", description = "jwt 유저의 라이딩기록을 생성")
@@ -34,7 +37,7 @@ class RidingHistoryController (private val service: RidingHistoryService, privat
 
         val email: String = jwtTokenProvider.getEmailFromJwt(token)
 
-        val ridingHistory = service.createRidingHistory(request.toRidingHistory(email))
+        val ridingHistory = ridingHistoryService.createRidingHistory(request.toRidingHistory(email))
         val ridingResponse = mapToResponse(ridingHistory)
 
         return ApiResponse.success(ResponseCode.CREATE_SUCCESS, ridingResponse)
@@ -59,7 +62,7 @@ class RidingHistoryController (private val service: RidingHistoryService, privat
 
         val email: String = jwtTokenProvider.getEmailFromJwt(token)
         val pageable: Pageable = PageRequest.of(page, size, Sort.by("date").descending())
-        val ridingsPage = service.getRidings(email, myRidesOnly, pageable)
+        val ridingsPage = ridingHistoryService.getRidings(email, myRidesOnly, pageable)
         val ridings = ridingsPage.content.map { riding -> mapToResponse(riding) }
 
         val ridingListResponse = RidingListResponse(
@@ -82,7 +85,7 @@ class RidingHistoryController (private val service: RidingHistoryService, privat
 
         val email: String = jwtTokenProvider.getEmailFromJwt(token)
 
-        val ridingList = service.getRidingsByDate(email, date)
+        val ridingList = ridingHistoryService.getRidingsByDate(email, date)
 
         val ridingListResponse = RidingDateListResponse(
                 ridings = ridingList.map { mapToResponse(it) }
@@ -92,27 +95,8 @@ class RidingHistoryController (private val service: RidingHistoryService, privat
 
 
 
-    //랭킹 조회
-//    @Operation(summary = "랭킹 조회", description = "")
-//    @Parameters(
-//            Parameter(name = "startDate", description = "조회 시작일"),
-//            Parameter(name = "endDate", description = "조회 마감일"),
-//            Parameter(name = "myRidesOnly", description = "내 라이딩만 조회"),
-//            Parameter(name = "page", description = "페이지 수"),
-//            Parameter(name = "size", description = "페이징 사이즈")
-//    )
-//    @GetMapping("/ridings/{userId}")
-//    fun getRanking(
-//            @RequestParam("startDate") startDate: LocalDate,
-//            @RequestParam("endDate") endDate: LocalDate,
-//            @RequestParam("page") page: Int,
-//            @RequestParam("size") size: Int,
-//            @RequestParam("myRidesOnly", defaultValue = "false") myRidesOnly: Boolean,
-//            @PathVariable(required = false) userId: String?
-//    ): ApiResponse<RidingListResponse> {
-//
-//        return ApiResponse.success(ResponseCode.READ_SUCCESS, RankingListResponse)
-//    }
+
+
 
     private fun mapToResponse(ridingHistory: RidingHistory): RidingResponse {
         return RidingResponse(
@@ -187,14 +171,81 @@ class RidingHistoryController (private val service: RidingHistoryService, privat
             val ridings: List<RidingResponse>
     )
 
-    data class RankingResponse(
-            val userId: String,
-            val userName: String,
-            val distanceMeters: Int,
-            val ridingMinutes: Int,
-            val co2Grams: Int,
-            val kcal: Int
+
+    //랭킹 조회
+    @Operation(summary = "랭킹 조회", description = "")
+    @Parameters(
+            Parameter(name = "startDate", description = "조회 시작일"),
+            Parameter(name = "endDate", description = "조회 마감일"),
+            Parameter(name = "page", description = "페이지 수"),
+            Parameter(name = "size", description = "페이징 사이즈")
     )
+    @GetMapping("/rankings")
+    fun getRanking(
+            @Validated @RequestHeader("Bearer") token: String,
+            @RequestParam("startDate") startDate: LocalDate,
+            @RequestParam("endDate") endDate: LocalDate,
+            @RequestParam("page") page: Int,
+            @RequestParam("size") size: Int,
+    ): ApiResponse<RankingListResponse> {
+
+        jwtTokenProvider.getEmailFromJwt(token)
+
+        val pageable: Pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "totalDistance"))
+
+        // 랭킹 데이터 조회
+        val rankings = ridingHistoryService.getRankingByDistance(startDate, endDate, pageable)
+
+        // 전체 통계 조회
+        val totalStatistics = ridingHistoryService.getTotalStatistics(startDate, endDate)
+
+        // 랭킹 응답 리스트 생성
+        val rankingResponseList = rankings.map { ranking ->
+            RankingResponse(
+                    _id = ranking._id,
+//                    nickname = userNicknames[ranking.email] ?: "Unknown",
+                    nickname = ranking._id?.let { userService.findUserByEmail(it)?.nickname },
+                    totalDistanceMeters = ranking.totalDistanceMeters,
+                    totalRidingMinutes = ranking.totalRidingMinutes,
+                    co2Grams = 0.021 * ranking.totalDistanceMeters!!,
+                    kcal = 0.01925 * ranking.totalDistanceMeters
+            )
+        }
+
+
+
+        val rankingListResponse = RankingListResponse(
+                currentPage = page + 1,
+                totalPages = (totalStatistics.totalUsers / size) + 1,
+                totalItems = totalStatistics.totalUsers.toLong(),
+                userCount = rankingResponseList.size,
+                totalRidingDistanceMeters = totalStatistics.totalDistanceMeters,
+                totalCo2Grams = 0.021 * totalStatistics.totalDistanceMeters,
+                totalRidingMinutes = totalStatistics.totalRidingMinutes,
+                totalTransportationExpenses = totalStatistics.totalReduceAmountWon,
+                rankingList = rankingResponseList
+        )
+
+        return ApiResponse.success(ResponseCode.READ_SUCCESS, rankingListResponse)
+
+    }
+
+    data class TotalStatistics(
+            val totalDistanceMeters: Int,
+            val totalRidingMinutes: Int,
+            val totalUsers: Int,
+            val totalReduceAmountWon: Int
+    )
+
+    data class RankingResponse(
+            val _id: String? = null,
+            val nickname: String? = null,
+            val totalDistanceMeters: Int? = null,
+            val totalRidingMinutes: Int? = null,
+            val co2Grams: Double = 0.0,
+            val kcal: Double = 0.0
+    )
+
 
     data class RankingListResponse(
             val currentPage: Int,
@@ -202,10 +253,9 @@ class RidingHistoryController (private val service: RidingHistoryService, privat
             val totalItems: Long,
             val userCount: Int,
             val totalRidingDistanceMeters: Int,
-            val totalTransportationExpenses: Int,
-            val totalCo2Grams: Int,
+            val totalCo2Grams: Double,
             val totalRidingMinutes: Int,
+            val totalTransportationExpenses: Int,
             val rankingList: List<RankingResponse>
     )
-
 }
