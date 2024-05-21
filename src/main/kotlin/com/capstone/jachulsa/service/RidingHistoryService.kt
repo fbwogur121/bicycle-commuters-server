@@ -1,5 +1,6 @@
 package com.capstone.jachulsa.service
 
+import com.capstone.jachulsa.controller.RidingHistoryController
 import com.capstone.jachulsa.domain.RidingHistory
 import com.capstone.jachulsa.dto.ResponseCode
 import com.capstone.jachulsa.exception.CustomException
@@ -7,7 +8,9 @@ import com.capstone.jachulsa.repository.RidingHistoryRepository
 import com.capstone.jachulsa.repository.UserRepository
 import org.bson.types.ObjectId
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.web.servlet.resource.NoResourceFoundException
 import java.time.LocalDate
@@ -44,4 +47,14 @@ class RidingHistoryService(private val ridingHistoryRepository: RidingHistoryRep
     fun getRidingsByDate(userId: String, date: LocalDate): List<RidingHistory> {
         return ridingHistoryRepository.findByEmailAndDate(userId, date)?.takeIf { it.isNotEmpty() }
                 ?: throw CustomException(ResponseCode.RIDING_NOT_FOUND)    }
+
+
+    fun getRankingByDistance(startDate: LocalDate, endDate: LocalDate, pageable: Pageable): List<RidingHistoryController.RankingResponse> {
+        return ridingHistoryRepository.getRankingByDistance(startDate, endDate, pageable)
+    }
+
+    fun getTotalStatistics(startDate: LocalDate, endDate: LocalDate): RidingHistoryController.TotalStatistics {
+        return ridingHistoryRepository.getTotalStatistics(startDate, endDate)
+    }
+
 }
