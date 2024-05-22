@@ -1,6 +1,7 @@
 package com.capstone.jachulsa.service
 
 import com.capstone.jachulsa.domain.User
+import com.capstone.jachulsa.exception.CustomException
 import com.capstone.jachulsa.repository.UserRepository
 import org.springframework.stereotype.Service
 
@@ -25,6 +26,8 @@ class UserService(private val userRepository: UserRepository) {
         return userRepository.save(updatedUser)
     }
 
-    fun findUserByEmail(email: String) = userRepository.findOneByEmail(email)
+    fun findUserByEmail(email: String): User {
+        return userRepository.findOneByEmail(email) ?: throw Exception("User not found with email: $email")
+    }
 
 }
