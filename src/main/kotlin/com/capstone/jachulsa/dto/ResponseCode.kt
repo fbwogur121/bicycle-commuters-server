@@ -47,7 +47,7 @@ enum class ResponseCode(
     USER_NOT_FOUND(HttpStatus.NOT_FOUND,2401,"사용자가 존재하지 않습니다."),
     EXPENDITURE_NOT_FOUND(HttpStatus.NOT_FOUND,2402,"지출 기록이 존재하지 않습니다."),
     RIDING_NOT_FOUND(HttpStatus.NOT_FOUND,2403,"라이딩 기록이 존재하지 않습니다."),
-
+    RANKING_NOT_FOUND(HttpStatus.NOT_FOUND,2404,"기간 내 라이딩 기록이 존재하지 않습니다."),
 
     // 409 Conflict
     RESOURCE_ALREADY_EXIST(HttpStatus.CONFLICT,2901,"이미 존재하는 { }입니다."),

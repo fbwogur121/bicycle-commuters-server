@@ -6,6 +6,7 @@ import com.capstone.jachulsa.domain.enumtype.RidingType
 import com.capstone.jachulsa.dto.ApiResponse
 import com.capstone.jachulsa.dto.ResponseCode
 import com.capstone.jachulsa.dto.request.RidingHistoryRequest
+import com.capstone.jachulsa.exception.CustomException
 import com.capstone.jachulsa.service.JwtTokenProvider
 import com.capstone.jachulsa.service.RidingHistoryService
 import com.capstone.jachulsa.service.UserService
@@ -192,14 +193,22 @@ class RidingHistoryController (private val ridingHistoryService: RidingHistorySe
         // 랭킹 데이터 조회
         val rankings = ridingHistoryService.getRankingByDistance(startDate, endDate, pageable)
 
+        // 랭킹 데이터가 없으면 예외 발생
+        if (rankings.isEmpty()) {
+            throw CustomException(ResponseCode.RANKING_NOT_FOUND)
+        }
+
         // 전체 통계 조회
         val totalStatistics = ridingHistoryService.getTotalStatistics(startDate, endDate)
 
         // 랭킹 응답 리스트 생성
-        val rankingResponseList = rankings.map { ranking ->
+        val rankingResponseList = rankings.mapIndexed { index, ranking ->
+            val user = userService.findUserByEmail(ranking._id)
             RankingResponse(
+                    rank = index + 1,
                     _id = ranking._id,
-                    nickname = ranking._id?.let { userService.findUserByEmail(it)?.nickname },
+                    name = user.name,
+                    nickname = user.nickname,
                     totalDistanceMeters = ranking.totalDistanceMeters,
                     totalRidingMinutes = ranking.totalRidingMinutes,
                     co2Grams = 0.021 * ranking.totalDistanceMeters!!,
@@ -218,9 +227,7 @@ class RidingHistoryController (private val ridingHistoryService: RidingHistorySe
                 totalTransportationExpenses = totalStatistics.totalReduceAmountWon,
                 rankingList = rankingResponseList
         )
-
         return ApiResponse.success(ResponseCode.READ_SUCCESS, rankingListResponse)
-
     }
 
     data class TotalStatistics(
@@ -231,7 +238,9 @@ class RidingHistoryController (private val ridingHistoryService: RidingHistorySe
     )
 
     data class RankingResponse(
-            val _id: String? = null,
+            val rank: Int? = null,
+            val _id: String,
+            val name: String? = null,
             val nickname: String? = null,
             val totalDistanceMeters: Int? = null,
             val totalRidingMinutes: Int? = null,
