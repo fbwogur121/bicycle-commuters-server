@@ -29,7 +29,7 @@ enum class ResponseCode(
     NOT_READABLE(HttpStatus.BAD_REQUEST,2001,"{mismatchedFieldNames} 필드가 누락되었거나 데이터 형식이 올바르지 않습니다."), //HttpMessageNotReadableException null,자료형
     NOT_NULL_FIELD(HttpStatus.BAD_REQUEST,2002," {fieldName} 필드의 입력값 [ rejectedValue ]이 유효하지 않습니다."), // MethodArgumentNotValidException (@VALID)
     TYPE_MISMATCHED(HttpStatus.BAD_REQUEST,2002," {fieldName} 필드의 입력값 [ rejectedValue ]의 형식이 올바르지 않습니다."), // MethodArgumentTypeMismatchException
-    MISSING_HEADER(HttpStatus.BAD_REQUEST,2003,"Bearer 헤더가 존재하지 않습니다."),
+    MISSING_HEADER(HttpStatus.BAD_REQUEST,2003,"Authorization 헤더가 존재하지 않습니다."),
 
 
 

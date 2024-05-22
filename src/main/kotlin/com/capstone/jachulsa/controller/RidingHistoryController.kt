@@ -29,13 +29,13 @@ class RidingHistoryController (private val ridingHistoryService: RidingHistorySe
                                private val jwtTokenProvider: JwtTokenProvider){
 
     // POST /riding : 라이딩 생성
-    @Operation(summary = "라이딩 생성", description = "jwt 유저의 라이딩기록을 생성")
+    @Operation(summary = "라이딩 생성", description = "jwt 유저의 라이딩 기록을 생성")
     @PostMapping("/riding")
     fun createRidingHistory(@Validated @RequestBody request: RidingHistoryRequest,
-                            @Validated @RequestHeader("Bearer") token: String
+                            @RequestHeader("Authorization", required = true) authorizationHeader: String
     ): ApiResponse<RidingResponse> {
 
-        val email: String = jwtTokenProvider.getEmailFromJwt(token)
+        val email: String = jwtTokenProvider.getEmailFromJwt(authorizationHeader)
 
         val ridingHistory = ridingHistoryService.createRidingHistory(request.toRidingHistory(email))
         val ridingResponse = mapToResponse(ridingHistory)
@@ -53,14 +53,14 @@ class RidingHistoryController (private val ridingHistoryService: RidingHistorySe
     )
     @GetMapping("/ridings")
     fun getRidings(
-            @RequestHeader("Bearer") token: String,
-            @RequestParam("page") page: Int,
-            @RequestParam("size") size: Int,
-            @RequestParam("myRidesOnly", defaultValue = "true") myRidesOnly: Boolean,
+            @RequestHeader("Authorization", required = true) authorizationHeader: String,
+            @RequestParam("page", defaultValue = "0") page: Int,
+            @RequestParam("size", defaultValue = "10") size: Int,
+            @RequestParam("myRidesOnly", defaultValue = "true") myRidesOnly: Boolean
 //            @PathVariable(required = false) userId: String?
     ): ApiResponse<RidingListResponse> {
 
-        val email: String = jwtTokenProvider.getEmailFromJwt(token)
+        val email: String = jwtTokenProvider.getEmailFromJwt(authorizationHeader)
         val pageable: Pageable = PageRequest.of(page, size, Sort.by("date").descending())
         val ridingsPage = ridingHistoryService.getRidings(email, myRidesOnly, pageable)
         val ridings = ridingsPage.content.map { riding -> mapToResponse(riding) }
@@ -79,11 +79,12 @@ class RidingHistoryController (private val ridingHistoryService: RidingHistorySe
     //라이딩 상세조회 - 일자별로
     @Operation(summary = "라이딩 상세 조회", description = "")
     @GetMapping("/riding")
-    fun getRidingHistory(@Validated @RequestHeader("Bearer") token: String,
-                         @Validated @RequestParam("date") date: LocalDate // 날짜(YYYY-MM-DD 형식)
+    fun getRidingHistory(
+            @RequestHeader("Authorization", required = true) authorizationHeader: String,
+            @Validated @RequestParam("date") date: LocalDate // 날짜(YYYY-MM-DD 형식)
     ): ApiResponse<RidingDateListResponse> {
 
-        val email: String = jwtTokenProvider.getEmailFromJwt(token)
+        val email: String = jwtTokenProvider.getEmailFromJwt(authorizationHeader)
 
         val ridingList = ridingHistoryService.getRidingsByDate(email, date)
 
@@ -92,11 +93,6 @@ class RidingHistoryController (private val ridingHistoryService: RidingHistorySe
         )
         return ApiResponse.success(ResponseCode.READ_SUCCESS, ridingListResponse)
     }
-
-
-
-
-
 
     private fun mapToResponse(ridingHistory: RidingHistory): RidingResponse {
         return RidingResponse(
@@ -182,14 +178,14 @@ class RidingHistoryController (private val ridingHistoryService: RidingHistorySe
     )
     @GetMapping("/rankings")
     fun getRanking(
-            @Validated @RequestHeader("Bearer") token: String,
-            @RequestParam("startDate") startDate: LocalDate,
-            @RequestParam("endDate") endDate: LocalDate,
-            @RequestParam("page") page: Int,
-            @RequestParam("size") size: Int,
+            @RequestHeader("Authorization", required = true) authorizationHeader: String,
+            @Validated @RequestParam("startDate", required = true) startDate: LocalDate,
+            @Validated @RequestParam("endDate", required = true) endDate: LocalDate,
+            @RequestParam("page", defaultValue = "0") page: Int,
+            @RequestParam("size", defaultValue = "10") size: Int,
     ): ApiResponse<RankingListResponse> {
 
-        jwtTokenProvider.getEmailFromJwt(token)
+        jwtTokenProvider.getEmailFromJwt(authorizationHeader)
 
         val pageable: Pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "totalDistance"))
 
@@ -203,7 +199,6 @@ class RidingHistoryController (private val ridingHistoryService: RidingHistorySe
         val rankingResponseList = rankings.map { ranking ->
             RankingResponse(
                     _id = ranking._id,
-//                    nickname = userNicknames[ranking.email] ?: "Unknown",
                     nickname = ranking._id?.let { userService.findUserByEmail(it)?.nickname },
                     totalDistanceMeters = ranking.totalDistanceMeters,
                     totalRidingMinutes = ranking.totalRidingMinutes,
@@ -211,8 +206,6 @@ class RidingHistoryController (private val ridingHistoryService: RidingHistorySe
                     kcal = 0.01925 * ranking.totalDistanceMeters
             )
         }
-
-
 
         val rankingListResponse = RankingListResponse(
                 currentPage = page + 1,
@@ -245,7 +238,6 @@ class RidingHistoryController (private val ridingHistoryService: RidingHistorySe
             val co2Grams: Double = 0.0,
             val kcal: Double = 0.0
     )
-
 
     data class RankingListResponse(
             val currentPage: Int,

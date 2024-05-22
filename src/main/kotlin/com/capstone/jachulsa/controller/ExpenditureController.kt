@@ -27,10 +27,10 @@ class ExpenditureController(private val service: ExpenditureService, private val
     @Operation(summary = "지출 생성", description = "해당 유저의 지출 기록 생성")
     @PostMapping
     fun createExpenditure(@Validated @RequestBody request: ExpenditureRequest,
-                          @Validated @RequestHeader("Bearer") token: String,
+                          @RequestHeader("Authorization", required = true) authorizationHeader: String
     ): ApiResponse<ExpenditureResponse> {
 
-        val email: String = jwtTokenProvider.getEmailFromJwt(token)
+        val email: String = jwtTokenProvider.getEmailFromJwt(authorizationHeader)
 
         val expenditure = service.createExpenditure(request.toExpenditure(email))
         val expenditureResponse = ExpenditureResponse(
@@ -45,19 +45,19 @@ class ExpenditureController(private val service: ExpenditureService, private val
         return ApiResponse.success(ResponseCode.CREATE_SUCCESS, expenditureResponse)
     }
 
-//    //GET /expenditure: 지출 기록 조회
-//    // 페이징 처리 필요, JWT 필요
+    //GET /expenditure: 지출 기록 조회
+    // 페이징 처리 필요, JWT 필요
     @GetMapping
     @Operation(summary = "지출 기록 조회", description = "지출 기록을 페이징 처리 후 반환, 페이지수는 0부터 !!")
     @Parameters(Parameter(name = "page", description = "페이지 수"),
-            Parameter(name = "size", description = "페이징 사이즈"))
+                Parameter(name = "size", description = "페이징 사이즈"))
     fun getExpenditure(
-            @RequestHeader("Bearer") token: String,
-            @RequestParam("page") page: Int,
-            @RequestParam("size") size: Int
+            @RequestHeader("Authorization", required = true) authorizationHeader: String,
+            @Validated @RequestParam("page",defaultValue = "0") page: Int,
+            @Validated @RequestParam("size",defaultValue = "10") size: Int
     ): ApiResponse<ExpenditureListResponse?> {
 
-        val email: String = jwtTokenProvider.getEmailFromJwt(token)
+        val email: String = jwtTokenProvider.getEmailFromJwt(authorizationHeader)
 
         val pageable: Pageable = PageRequest.of(page, size, Sort.by("date").descending())
         val expendituresPage = email?.let { service.getExpenditures(it, pageable) }
@@ -99,11 +99,3 @@ class ExpenditureController(private val service: ExpenditureService, private val
         val expenditures: List<ExpenditureResponse>
     )
 }
-
-
-
-
-
-
-
-

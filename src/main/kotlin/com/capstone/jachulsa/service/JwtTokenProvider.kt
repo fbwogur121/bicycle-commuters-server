@@ -16,7 +16,7 @@ import java.security.Key
 
 
 @Service
-class JwtTokenProvider(private val userRepository: UserRepository){
+class JwtTokenProvider(private val userRepository: UserRepository) {
 
     private lateinit var key: Key
 
@@ -36,30 +36,29 @@ class JwtTokenProvider(private val userRepository: UserRepository){
     // JWT 생성
     fun generateJwt(email: String): String {
 
-        System.out.println(email)
         userRepository.findOneByEmail(email) ?: throw CustomException(ResponseCode.USER_NOT_FOUND)
 
         val expirationDate = Date(System.currentTimeMillis() + EXPIRATION_TIME_MS)
 
-        return Jwts.builder()
+        return "Bearer " + Jwts.builder()
                 .setSubject(email)
                 .setExpiration(expirationDate)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact()
     }
 
-    // JWT 유효성 검사
-    fun validateJwt(token: String): Boolean {
-        return try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token)
-            true
-        } catch (e: Exception) {
-            false
+    // JWT 토큰을 Authorization 헤더에서 추출
+    private fun extractJwtFromHeader(authorizationHeader: String): String {
+        return if (authorizationHeader.startsWith("Bearer ")) {
+            authorizationHeader.substring(7)
+        } else {
+            throw CustomException(ResponseCode.INVALID_ACCESS_TOKEN)
         }
     }
 
-    // JWT에서 email 추출 - sub: "~~@naver.com"
-    fun getEmailFromJwt(token: String): String {
+    // JWT에서 email 추출
+    fun getEmailFromJwt(authorizationHeader: String): String {
+        val token = extractJwtFromHeader(authorizationHeader)
         return try {
             val claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).body
             claims["sub"]?.toString() ?: throw CustomException(ResponseCode.INVALID_EMAIL_CLAIM)
@@ -68,8 +67,7 @@ class JwtTokenProvider(private val userRepository: UserRepository){
         }
     }
 
-
-//    fun getEmailFromJwt(token: String): String { //- email json으로 저장될 시
+    //    fun getEmailFromJwt(token: String): String { //- email 외 sub 정보가 추가될 시
 //        return try {
 //            val claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).body
 //            val subClaim = claims["sub"]?.toString()
@@ -79,14 +77,6 @@ class JwtTokenProvider(private val userRepository: UserRepository){
 //            throw CustomException(ResponseCode.INVALID_ACCESS_TOKEN)
 //        }
 //    }
-
-//    // JWT 토큰을 Authorization 헤더에서 추출하는 함수
-//    private fun extractJwtFromHeader(authorizationHeader: String?): String? {
-//        return if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-//            authorizationHeader.substring(7)
-//        } else {
-//            null
-//        }
 
 //    // JWT 토큰에서 사용자 인증 정보 추출
 //    fun getAuthentication(token: String): Authentication? {
