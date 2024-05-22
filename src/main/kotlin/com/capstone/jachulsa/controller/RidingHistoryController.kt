@@ -89,9 +89,17 @@ class RidingHistoryController (private val ridingHistoryService: RidingHistorySe
 
         val ridingList = ridingHistoryService.getRidingsByDate(email, date)
 
+        val totalStatistics = ridingHistoryService.getTotalStatisticsByDate(email, date)
+
         val ridingListResponse = RidingDateListResponse(
+                totalDistanceMeters = totalStatistics.totalDistanceMeters,
+                totalRidingMinutes = totalStatistics.totalRidingMinutes,
+                totalExpenditure = totalStatistics.totalExpenditure,
+                totalReduceAmountWon = totalStatistics.totalReduceAmountWon,
+                totalCo2Grams = totalStatistics.totalCo2Grams,
                 ridings = ridingList.map { mapToResponse(it) }
         )
+
         return ApiResponse.success(ResponseCode.READ_SUCCESS, ridingListResponse)
     }
 
@@ -165,7 +173,20 @@ class RidingHistoryController (private val ridingHistoryService: RidingHistorySe
     )
 
     data class RidingDateListResponse(
+            val totalDistanceMeters: Int,
+            val totalRidingMinutes: Int,
+            val totalExpenditure: Int,
+            val totalReduceAmountWon: Int,
+            val totalCo2Grams: Double,
             val ridings: List<RidingResponse>
+    )
+
+    data class TotalDayStatistics(
+            val totalDistanceMeters: Int,
+            val totalRidingMinutes: Int,
+            val totalExpenditure: Int,
+            val totalReduceAmountWon: Int,
+            val totalCo2Grams: Double
     )
 
 
