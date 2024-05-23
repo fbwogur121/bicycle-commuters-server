@@ -6,7 +6,6 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.repository.Aggregation
 import org.springframework.data.mongodb.repository.MongoRepository
-import org.springframework.data.mongodb.repository.Query
 import java.time.LocalDate
 
 interface RidingHistoryRepository :MongoRepository<RidingHistory, String>{
@@ -28,7 +27,8 @@ interface RidingHistoryRepository :MongoRepository<RidingHistory, String>{
 
     @Aggregation(pipeline = [
         "{ \$match: { date: { \$gte: ?0, \$lte: ?1 } } }",
-        "{ \$group: { _id: null, totalDistanceMeters: { \$sum: '\$distanceMeters' }, totalRidingMinutes: { \$sum: '\$ridingMinutes' }, totalUsers: { \$sum: 1 }, totalReduceAmountWon: { \$sum: { \$toInt: '\$reduceAmountWon' } } } }"
+        "{ \$group: { _id: '\$email', totalDistanceMeters: { \$sum: '\$distanceMeters' }, totalRidingMinutes: { \$sum: '\$ridingMinutes' }, totalReduceAmountWon: { \$sum:  '\$reduceAmountWon' } } }",
+        "{ \$group: { _id: null, totalDistanceMeters: { \$sum: '\$totalDistanceMeters' }, totalRidingMinutes: { \$sum: '\$totalRidingMinutes' }, totalUsers: { \$sum: 1 }, totalReduceAmountWon: { \$sum: '\$totalReduceAmountWon' } } } }"
     ])
     fun getTotalStatistics(startDate: LocalDate, endDate: LocalDate): RidingHistoryController.TotalStatistics
 }

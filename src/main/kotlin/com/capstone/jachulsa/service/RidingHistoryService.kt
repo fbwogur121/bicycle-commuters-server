@@ -7,13 +7,9 @@ import com.capstone.jachulsa.exception.CustomException
 import com.capstone.jachulsa.repository.ExpenditureRepository
 import com.capstone.jachulsa.repository.RidingHistoryRepository
 import com.capstone.jachulsa.repository.UserRepository
-import org.bson.types.ObjectId
 import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
-import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
-import org.springframework.web.servlet.resource.NoResourceFoundException
 import java.time.LocalDate
 
 @Service
