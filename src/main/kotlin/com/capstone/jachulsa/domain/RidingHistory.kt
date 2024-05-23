@@ -22,7 +22,7 @@ data class RidingHistory(
         val stopover: Stopover?,
         val ridingMinutes: Int,
         val distanceMeters: Int,
-        val reduceAmountWon: Int?
+        val reduceAmountWon: Int
 )
 
 data class Departures(

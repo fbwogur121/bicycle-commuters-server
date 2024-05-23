@@ -226,7 +226,7 @@ class RidingHistoryController (private val ridingHistoryService: RidingHistorySe
         val rankingResponseList = rankings.mapIndexed { index, ranking ->
             val user = userService.findUserByEmail(ranking._id)
             RankingResponse(
-                    rank = index + 1,
+                    rank = page * size + index + 1,
                     _id = ranking._id,
                     name = user.name,
                     nickname = user.nickname,
@@ -239,13 +239,12 @@ class RidingHistoryController (private val ridingHistoryService: RidingHistorySe
 
         val rankingListResponse = RankingListResponse(
                 currentPage = page + 1,
-                totalPages = (totalStatistics.totalUsers / size) + 1,
-                totalItems = totalStatistics.totalUsers.toLong(),
+                totalPages = (totalStatistics.totalUsers / size) + (if (totalStatistics.totalUsers % size == 0) 0 else 1),
                 userCount = rankingResponseList.size,
                 totalRidingDistanceMeters = totalStatistics.totalDistanceMeters,
                 totalCo2Grams = 0.021 * totalStatistics.totalDistanceMeters,
                 totalRidingMinutes = totalStatistics.totalRidingMinutes,
-                totalTransportationExpenses = totalStatistics.totalReduceAmountWon,
+                totalReduceAmountWon = totalStatistics.totalReduceAmountWon,
                 rankingList = rankingResponseList
         )
         return ApiResponse.success(ResponseCode.READ_SUCCESS, rankingListResponse)
@@ -272,12 +271,11 @@ class RidingHistoryController (private val ridingHistoryService: RidingHistorySe
     data class RankingListResponse(
             val currentPage: Int,
             val totalPages: Int,
-            val totalItems: Long,
             val userCount: Int,
             val totalRidingDistanceMeters: Int,
             val totalCo2Grams: Double,
             val totalRidingMinutes: Int,
-            val totalTransportationExpenses: Int,
+            val totalReduceAmountWon: Int,
             val rankingList: List<RankingResponse>
     )
 }
