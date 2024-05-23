@@ -20,7 +20,7 @@ data class RidingHistoryRequest(
     val stopover: Stopover?,
     val ridingMinutes: Int,
     val distanceMeters: Int,
-    val reduceAmountWon: Int?
+    val reduceAmountWon: Int
 ) {
     fun toRidingHistory(email: String) : RidingHistory {
         return RidingHistory(
