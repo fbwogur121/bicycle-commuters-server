@@ -16,6 +16,6 @@ class SwaggerConfig {
 
     private fun apiInfo() = Info()
             .title("Jachulsa Swagger")
-            .description("CapstoneDesign 자출사 프로젝트 Swagger UI test")
+            .description("CapstoneDesign 자출사 프로젝트 Swagger UI test2")
             .version("1.0.0")
 }
