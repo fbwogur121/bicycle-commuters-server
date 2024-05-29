@@ -40,7 +40,7 @@ class JwtTokenProvider(private val userRepository: UserRepository) {
 
         val expirationDate = Date(System.currentTimeMillis() + EXPIRATION_TIME_MS)
 
-        return "Bearer " + Jwts.builder()
+        return Jwts.builder()
                 .setSubject(email)
                 .setExpiration(expirationDate)
                 .signWith(key, SignatureAlgorithm.HS256)
