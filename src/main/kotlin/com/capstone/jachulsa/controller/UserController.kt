@@ -2,14 +2,17 @@ package com.capstone.jachulsa.controller
 
 import com.capstone.jachulsa.domain.User
 import com.capstone.jachulsa.repository.UserRepository
+import com.capstone.jachulsa.service.JwtTokenProvider
 import com.capstone.jachulsa.service.UserService
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/users")
 class UserController(
     private val repository: UserRepository,
-    private val userService: UserService
+    private val userService: UserService,
+    private val jwtTokenProvider: JwtTokenProvider
 ) {
 
     // GET /users : 모든 사용자 조회
@@ -65,28 +68,26 @@ class UserController(
     }
 
 
-    // POST /users/name : 주어진 name으로 유저 조회
-    @PostMapping("/name")
-    fun getUsersByName(@RequestBody request: Map<String, String>): List<User> {
-        val name = request["name"]
-        return if (name != null) {
-            repository.findByName(name)
-        } else {
-            emptyList()
-        }
+    // GET /users/userInfo : jwtToken으로 유저 조회
+    @GetMapping("/userInfo")
+    fun getUserInfo(@RequestHeader("Authorization", required = true) authorizationHeader: String): User {
+        val email: String = jwtTokenProvider.getEmailFromJwt(authorizationHeader)
+        return userService.findUserByEmail(email)
     }
 
-    // PUT /users/deactivate : 주어진 email로 유저 탈퇴(is_active true>false)
+    // PUT /users/deactivate : jwtToken으로 유저 탈퇴(is_active true>false)
     @PutMapping("/deactivate")
-    fun deactivateUser(@RequestBody request: Map<String, String>): User {
-        val email = request["email"] ?: throw Exception("Email is required")
+    fun deactivateUser(@RequestHeader("Authorization", required = true) authorizationHeader: String
+    ): User {
+        val email: String = jwtTokenProvider.getEmailFromJwt(authorizationHeader)
         return userService.deactivateUser(email)
     }
 
-    // PUT /users/activate : 주어진 email로 사용자의 is_active를 true로 변경
+    // PUT /users/activate : jwtTokendm로 사용자의 is_active를 true로 변경
     @PutMapping("/activate")
-    fun activateUser(@RequestBody request: Map<String, String>): User {
-        val email = request["email"] ?: throw Exception("Email is required")
+    fun activateUser(@RequestHeader("Authorization", required = true) authorizationHeader: String
+    ): User {
+        val email: String = jwtTokenProvider.getEmailFromJwt(authorizationHeader)
         return userService.activateUser(email)
     }
 }
